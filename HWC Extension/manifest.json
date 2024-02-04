@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "HWC",
+    "description": "Een HWC Extensie",
+    "version": "1.0.0",
+    "chrome_url_overrides": {
+        "newtab": "index.html"
+    },
+    "icons": {
+        "128": "128.png"
+    },
+    "action": {
+        "default_icon": "128.png",
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "storage"
+    ]
+}
