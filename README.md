@@ -6,6 +6,7 @@ Dit is een chrome extensie gemaakt voor leerlingen van het hwc
 
 ## Web Store
 Microsoft Edge:  https://microsoftedge.microsoft.com/addons/detail/moejdpolglpcpcgbnahciahkdhlhckim
+
 Google Chrome:  Nog niet beschikbaar!
 ## Installatie
 ### Download de extensie:
