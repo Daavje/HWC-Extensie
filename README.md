@@ -7,7 +7,7 @@ Dit is een chrome extensie gemaakt voor leerlingen van het hwc
 ## Web Store
 Microsoft Edge:    https://microsoftedge.microsoft.com/addons/detail/moejdpolglpcpcgbnahciahkdhlhckim
 
-Google Chrome:     Nog niet beschikbaar!
+Google Chrome:     Niet beschikbaar!
 ## Installatie
 ### Download de extensie:
 Ga naar de website waar de Chrome-extensie beschikbaar is en zoek naar de downloadoptie. Meestal wordt dit aangeboden als een gecomprimeerd bestand (ZIP).
