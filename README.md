@@ -1,8 +1,21 @@
 # HWC-Extensie
+## Over de HWC Extensie
 
-👋 Hi, I’m @Daavje
+Deze extensie vervangt de standaard startpagina van je browser door een aangepaste homepage die speciaal is ontworpen voor leerlingen van het HWC. In plaats van de standaard Google-pagina, krijg je direct toegang tot handige snelkoppelingen naar veelgebruikte tools en platforms.
 
-Dit is een chrome extensie gemaakt voor leerlingen van het hwc
+### Functionaliteiten
+
+- Een overzichtelijke homepage met een groot, duidelijk weergegeven tijdstip.
+- Directe toegang tot belangrijke platforms via intuïtieve icoontjes:
+  - Magister Leerling
+  - Outlook Mail
+  - Workspace365
+  - YouTube
+  - ChatGPT
+  - Discord
+- Klik op een icoon en je wordt direct doorgestuurd naar de bijbehorende website.
+
+Deze extensie zorgt ervoor dat je sneller en eenvoudiger toegang hebt tot de digitale tools die je dagelijks nodig hebt voor school.
 
 ## Web Store
 Microsoft Edge:    https://microsoftedge.microsoft.com/addons/detail/moejdpolglpcpcgbnahciahkdhlhckim
