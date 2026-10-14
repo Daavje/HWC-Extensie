@@ -1,50 +1,68 @@
-# HWC-Extensie
-## Over de HWC Extensie
+# HWC Dashboard Next ✦
 
-Deze extensie vervangt de standaard startpagina van je browser door een aangepaste homepage die speciaal is ontworpen voor leerlingen van het HWC. In plaats van de standaard Google-pagina, krijg je direct toegang tot handige snelkoppelingen naar veelgebruikte tools en platforms.
+Een vernieuwde, persoonlijke startpagina voor leerlingen van het Hermann Wesselink College. Gebaseerd op het idee van [HWC-Extensie](https://github.com/Daavje/HWC-Extensie), maar volledig opnieuw opgebouwd met een responsive dashboard en extra functies.
 
-### Functionaliteiten
+## Wat is nieuw?
 
-- Een overzichtelijke homepage met een groot, duidelijk weergegeven tijdstip.
-- Directe toegang tot belangrijke platforms via intuïtieve icoontjes:
-  - Magister Leerling
-  - Outlook Mail
-  - Workspace365
-  - YouTube
-  - ChatGPT
-  - Discord
-- Klik op een icoon en je wordt direct doorgestuurd naar de bijbehorende website.
+- **Nieuwe-tabbladpagina** voor Chrome en Microsoft Edge (Manifest V3).
+- **Aanpasbare snelkoppelingen** (max. 12), standaard Magister, Outlook, Workspace365, ChatGPT, DeepL en YouTube. Links bewerken en verwijderen.
+- **Takenlijst** met afvinken, belangrijke taken en filters.
+- **Deadlines** op basis van taken met een datum; achterstallige deadlines worden getoond.
+- **Persoonlijke notities** met automatisch lokaal opslaan.
+- **Focustimer** met instelbare focus- en pauzeduur, pauzeren en hervatten. De tijd blijft doorlopen als je het tabblad sluit; bij heropenen zie je de resterende tijd.
+- **Zoekbalk** met Google, DuckDuckGo of Bing. Sneltoetsen: `Ctrl+K` / `Cmd+K` en `/` om te zoeken, `N` om een taak toe te voegen.
+- **Personalisatie:** je naam, lichte/donkere modus, accentkleur, 12/24-uursklok.
+- **JSON-back-up** voor export/import van je taken, notities, links en instellingen.
+- **Responsief en toegankelijk:** werkt ook op kleinere schermen, toetsenbordbediening, minder animatie bij `prefers-reduced-motion`.
 
-Deze extensie zorgt ervoor dat je sneller en eenvoudiger toegang hebt tot de digitale tools die je dagelijks nodig hebt voor school.
+> **Belangrijk:** Deze versie haalt geen live roosters, cijfers of huiswerk uit Magister. De Magister-knop opent de officiële website; taken en deadlines voer je zelf in.
 
-## Web Store
-Microsoft Edge:    https://microsoftedge.microsoft.com/addons/detail/moejdpolglpcpcgbnahciahkdhlhckim
+## Installatie (Chrome / Edge)
 
-Google Chrome:     Niet beschikbaar!
-## Installatie
-### Download de extensie:
-Ga naar de website waar de Chrome-extensie beschikbaar is en zoek naar de downloadoptie. Meestal wordt dit aangeboden als een gecomprimeerd bestand (ZIP).
+1. Download deze repository als ZIP en pak hem uit.
+2. Open `chrome://extensions` (Chrome) of `edge://extensions` (Edge).
+3. Zet **Ontwikkelaarsmodus** aan.
+4. Klik op **Uitgepakte extensie laden** / **Load unpacked**.
+5. Selecteer de uitgepakte map met `manifest.json`.
+6. Open een nieuw tabblad. Klaar! Bij meerdere nieuw-tabbladextensies kan je browser vragen welke je wilt gebruiken.
 
-### Pak het ZIP-bestand uit:
-Nadat je het ZIP-bestand hebt gedownload, pak je het uit naar een map op je computer. Je kunt hiervoor gebruikmaken van de ingebouwde functie van je besturingssysteem of een programma zoals WinRAR of 7-Zip.
+**Bestaande extensie?** Schakel je oude HWC-extensie uit, omdat er maar één nieuw-tabbladvervanger tegelijk actief kan zijn. De instellingen uit versie 1 worden niet automatisch overgezet.
 
-### Open het Chrome-extensiebeheer:
-Typ chrome://extensions/ in de adresbalk van Chrome en druk op Enter.
-Of klik op de drie puntjes in de rechterbovenhoek van je Chrome-venster, ga naar 'Meer hulpprogramma's' en kies 'Extensies'.
-Activeer de ontwikkelaarsmodus:
-Zorg ervoor dat de ontwikkelaarsmodus is ingeschakeld. Dit kun je vinden als een schakelaar ergens bovenaan de extensiebeheerpagina.
+## Privacy en techniek
 
-### Laad de extensie:
-Klik op de knop 'Pak een ingepakt bestand uit' of 'Load unpacked', afhankelijk van je Chrome-versie.
+- Geen accounts, tracking, analytics, externe scripts of externe lettertypes.
+- Alleen de Chrome/Edge-permissie `storage` is nodig.
+- Taken, links, notities en instellingen worden opgeslagen met `chrome.storage.local` in je browserprofiel, **niet** doorgestuurd naar een server of automatisch gesynchroniseerd tussen apparaten.
+- Er worden geen Magister-inloggegevens gelezen of opgeslagen.
+- Zoekopdrachten worden pas naar de gekozen zoekmachine gestuurd als je op **Zoeken** drukt.
+- Maak regelmatig een back-up via **Instellingen → Exporteer gegevens**; bij verwijderen van de extensie kunnen de gegevens verdwijnen.
+- Importeer alleen vertrouwde JSON-back-ups. Importeren vervangt je huidige gegevens.
 
-### Selecteer de map van de uitgepakte extensie:
-Navigeer naar de map waarin je de extensie hebt uitgepakt en selecteer deze. Klik op 'OK' of 'Open' om de extensie te laden.
+## Projectstructuur
 
-### Controleer of de extensie is toegevoegd:
-Na het laden zou de extensie in de lijst met geïnstalleerde extensies moeten verschijnen. Je ziet mogelijk ook het pictogram van de extensie naast de adresbalk van je browser.
+```
+manifest.json        Manifest V3
+index.html           Dashboard
+styles.css           Responsive opmaak
+app.js               Interface en opslag
+lib.js               Validatie en gegevensmodel
+popup.html           Kleine extensie-popup
+icons/               PNG-iconen
+ tests/              Automatische tests
+```
 
-### Configureer indien nodig:
-Sommige extensies vereisen configuratie. Als dat het geval is, ga naar de extensie-instellingen en pas deze naar wens aan.
+## Ontwikkeling en tests
 
-### Test de extensie:
-Open een nieuw tabblad en probeer de functionaliteit van de extensie uit om te controleren of deze naar behoren werkt.
+Geen npm-installatie of bundler vereist. Vereist Node.js 20+ om de tests uit te voeren:
+
+```bash
+node --test tests/*.test.mjs
+node --check app.js
+node --check lib.js
+```
+
+In deze repository staat de versie 2-code in de root. Publiceer je een Chrome Web Store-release, test dan eerst in Chrome en Edge en controleer de actuele storevereisten.
+
+## Credits
+
+Gebaseerd op het oorspronkelijke HWC-Extensie-project van [Daavje](https://github.com/Daavje). Onafhankelijk leerlingenproject; geen officieel product van HWC of Magister.
