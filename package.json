@@ -1,7 +1,10 @@
 {
   "name": "hwc-dashboard-next",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node --test tests/*.test.mjs", "check": "node --check app.js && node --check lib.js && npm test" }
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check app.js && node --check lib.js && node --check magister.js && node --check background.js && npm test"
+  }
 }

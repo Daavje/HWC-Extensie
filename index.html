@@ -52,6 +52,16 @@
         <p class="hint">Tip: klik op het potloodje bij een snelkoppeling om deze aan te passen.</p>
       </section>
 
+      <section class="panel roster-panel" aria-labelledby="rosterTitle">
+        <div class="panel-head roster-header">
+          <div><div class="eyebrow">AUTOMATISCH UIT MAGISTER</div><h2 id="rosterTitle">Mijn rooster <span id="rosterConnection" class="roster-badge">Niet gekoppeld</span></h2></div>
+          <div class="roster-actions"><button id="rosterRefresh" class="secondary-button roster-refresh" type="button" disabled>↻ Verversen</button><button id="rosterSettings" class="small-button" type="button">⚙ Koppelen</button></div>
+        </div>
+        <p id="rosterStatus" class="roster-status" role="status" aria-live="polite">Koppel een Magister Auth Gateway om je lessen automatisch te tonen.</p>
+        <div class="roster-nav" aria-label="Weeknavigatie"><button id="rosterPrev" type="button" class="tiny-icon" aria-label="Vorige week">‹</button><strong id="rosterWeek">Deze week</strong><button id="rosterNext" type="button" class="tiny-icon" aria-label="Volgende week">›</button><button id="rosterCurrent" type="button" class="text-button">Vandaag</button></div>
+        <div id="rosterGrid" class="roster-grid" aria-live="polite"></div>
+      </section>
+
       <div class="dashboard-grid">
         <section class="panel tasks-panel" aria-labelledby="tasksTitle">
           <div class="panel-head"><div><div class="eyebrow">JOUW PLANNING</div><h2 id="tasksTitle">Taken <span id="taskCount" class="count">0</span></h2></div><button id="taskAdd" class="small-button" type="button">+ Nieuwe taak</button></div>
@@ -122,6 +132,17 @@
       <p class="settings-tip">Je gegevens blijven lokaal in deze browser. Importeer alleen een back-up die je vertrouwt; importeren vervangt de huidige gegevens.</p>
       <p id="settingsError" class="form-error" role="alert"></p>
       <div class="modal-actions"><button type="button" class="secondary-button" data-close="settingsDialog">Annuleren</button><button class="primary-button" type="submit">Instellingen opslaan</button></div>
+    </form>
+  </dialog>
+  <dialog id="magisterDialog" class="modal" aria-labelledby="magisterDialogTitle">
+    <form id="magisterForm" class="modal-form" novalidate>
+      <div class="modal-title"><h2 id="magisterDialogTitle">Magister koppelen</h2><button class="close-button" type="button" data-close="magisterDialog" aria-label="Sluiten">×</button></div>
+      <p class="settings-tip">Gebruik de <a href="https://github.com/Daavje/magister-auth-gateway" target="_blank" rel="noopener noreferrer">Magister Auth Gateway</a>. Log daar één keer in en maak in het dashboard een <strong>Managed Proxy Key</strong> aan. Je Magister-wachtwoord voer je hier nooit in.</p>
+      <label>HTTPS-adres van je gateway<input name="gateway" type="url" required autocomplete="off" placeholder="https://gateway.jouwdomein.nl" spellcheck="false"></label>
+      <label>Managed Proxy Key<input name="proxyKey" type="password" autocomplete="off" spellcheck="false" placeholder="mag_sk_live_..." minlength="16"></label>
+      <p class="settings-tip">De sleutel wordt <strong>alleen lokaal</strong> in deze browser bewaard, apart van je gewone dashboard-back-ups. De extensie vraagt alleen toegang tot het gateway-adres dat je invult. Gebruik uitsluitend een gateway die je vertrouwt. Laat de sleutel leeg om je bestaande sleutel te behouden.</p>
+      <p id="magisterError" class="form-error" role="alert"></p>
+      <div class="modal-actions"><button id="magisterDisconnect" type="button" class="secondary-button danger-button" hidden>Ontkoppelen</button><button class="primary-button" type="submit">Verbinden & ophalen</button></div>
     </form>
   </dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>

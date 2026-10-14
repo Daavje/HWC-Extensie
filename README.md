@@ -5,6 +5,8 @@ Een vernieuwde, persoonlijke startpagina voor leerlingen van het Hermann Wesseli
 ## Wat is nieuw?
 
 - **Nieuwe-tabbladpagina** voor Chrome en Microsoft Edge (Manifest V3).
+- **Automatisch Magister-rooster** via een eigen of vertrouwde [Magister Auth Gateway](https://github.com/Daavje/magister-auth-gateway): lessen, tijden, lokalen, docenten, lesinhoud en uitval (wanneer Magister deze gegevens levert).
+- **Automatisch verversen:** bij openen indien nodig en elke 15 minuten op de achtergrond zolang de browser draait; tot vier weken rooster (vorige, huidige en twee komende weken).
 - **Aanpasbare snelkoppelingen** (max. 12), standaard Magister, Outlook, Workspace365, ChatGPT, DeepL en YouTube. Links bewerken en verwijderen.
 - **Takenlijst** met afvinken, belangrijke taken en filters.
 - **Deadlines** op basis van taken met een datum; achterstallige deadlines worden getoond.
@@ -15,7 +17,7 @@ Een vernieuwde, persoonlijke startpagina voor leerlingen van het Hermann Wesseli
 - **JSON-back-up** voor export/import van je taken, notities, links en instellingen.
 - **Responsief en toegankelijk:** werkt ook op kleinere schermen, toetsenbordbediening, minder animatie bij `prefers-reduced-motion`.
 
-> **Belangrijk:** Deze versie haalt geen live roosters, cijfers of huiswerk uit Magister. De Magister-knop opent de officiële website; taken en deadlines voer je zelf in.
+> **Belangrijk:** Magister werkt na eenmalig instellen van een gateway en Managed Proxy Key. Dit is geen officiële Magister-integratie. De takenlijst blijft handmatig; eventuele lesinhoud uit Magister wordt **alleen bij de betreffende les** getoond. Cijfers worden niet opgehaald.
 
 ## Installatie (Chrome / Edge)
 
@@ -28,15 +30,32 @@ Een vernieuwde, persoonlijke startpagina voor leerlingen van het Hermann Wesseli
 
 **Bestaande extensie?** Schakel je oude HWC-extensie uit, omdat er maar één nieuw-tabbladvervanger tegelijk actief kan zijn. De instellingen uit versie 1 worden niet automatisch overgezet.
 
+## Magister instellen (eenmalig)
+
+Deze functie gebruikt de **Managed Proxy API Key** uit de [Magister Auth Gateway](https://github.com/Daavje/magister-auth-gateway). Je hoeft geen wachtwoord in de extensie in te voeren.
+
+1. Zorg voor een **werkende gateway via HTTPS**. Gebruik een eigen installatie of uitsluitend een gateway waarvan je de beheerder vertrouwt. Een GitHub-repository op zichzelf is **geen** draaiende gateway.
+2. Open het gateway-dashboard, meld je aan via de door de gateway ondersteunde Magister/Discipulus-authenticatie en maak een **Proxy Key** aan (`mag_sk_...`).
+3. Open een nieuw tabblad met HWC Dashboard Next, klik bij **Mijn rooster → Koppelen**.
+4. Vul de volledige gateway-origin in, bijvoorbeeld `https://gateway.voorbeeld.nl`, en plak de Proxy Key. Gebruik geen pad achter de domeinnaam.
+5. Klik **Verbinden & ophalen** en geef je browser toestemming om dit specifieke domein te benaderen.
+6. Als de gateway de Magister-API ondersteunt, verschijnen je afspraken automatisch. In de extensie kun je eerdere en komende weken bekijken en handmatig verversen.
+
+**Werking:** de extensie doet via de gateway een GET-verzoek naar `/api/proxy/api/personen/me/afspraken?van=...&tot=...&status=1`. De sleutel gaat alleen als `Authorization: Bearer`-header naar de gekozen gateway. De gateway regelt het verversen van je Magister-tokens, mits die functie op je gateway is geconfigureerd. Voor ongeldige sleutels, offline gateways of gewijzigde API-endpoints verschijnt een foutmelding en blijft een eerder rooster zichtbaar.
+
+**Geen gateway?** Dan blijft het dashboard gewoon bruikbaar voor taken, notities en andere functies, maar kan het geen live Magister-rooster ophalen. Een live verbinding met een echte leerlingaccount is niet automatisch getest door de unit-tests.
+
 ## Privacy en techniek
 
-- Geen accounts, tracking, analytics, externe scripts of externe lettertypes.
-- Alleen de Chrome/Edge-permissie `storage` is nodig.
-- Taken, links, notities en instellingen worden opgeslagen met `chrome.storage.local` in je browserprofiel, **niet** doorgestuurd naar een server of automatisch gesynchroniseerd tussen apparaten.
-- Er worden geen Magister-inloggegevens gelezen of opgeslagen.
-- Zoekopdrachten worden pas naar de gekozen zoekmachine gestuurd als je op **Zoeken** drukt.
-- Maak regelmatig een back-up via **Instellingen → Exporteer gegevens**; bij verwijderen van de extensie kunnen de gegevens verdwijnen.
-- Importeer alleen vertrouwde JSON-back-ups. Importeren vervangt je huidige gegevens.
+- Geen analytics, tracking, externe scripts of externe lettertypes.
+- Browsermachtigingen: `storage`, `alarms`, `permissions`. Toegang tot websites is **optioneel** en wordt alleen aangevraagd voor de door jou ingevulde HTTPS-gateway.
+- De Managed Proxy Key wordt apart in `chrome.storage.local` bewaard en **niet** meegenomen in de gewone JSON-export/import. Deel de sleutel nooit in een issue, screenshot of openbare repository.
+- Je rooster wordt lokaal gecachet in `chrome.storage.local` zodat het ook bij een verbindingsfout zichtbaar kan blijven.
+- Via **Instellingen → Ontkoppelen** verwijder je de sleutel en het gecachte rooster, en wordt de optionele websitetoestemming ingetrokken.
+- Magister-gegevens worden rechtstreeks via je opgegeven gateway opgehaald; de beheerder van die gateway kan mogelijk toegang tot je schoolgegevens hebben. Gebruik een vertrouwde instantie.
+- Taken, links, notities en instellingen worden lokaal opgeslagen en niet automatisch tussen apparaten gesynchroniseerd.
+- Zoekopdrachten gaan pas naar de ingestelde zoekmachine nadat je zoekt.
+- Maak regelmatig een back-up via **Instellingen → Exporteer gegevens**. Importeren vervangt bestaande dashboardinstellingen en taken, maar laat de Magister-koppeling ongemoeid.
 
 ## Projectstructuur
 
@@ -44,11 +63,13 @@ Een vernieuwde, persoonlijke startpagina voor leerlingen van het Hermann Wesseli
 manifest.json        Manifest V3
 index.html           Dashboard
 styles.css           Responsive opmaak
-app.js               Interface en opslag
+app.js               Interface, Magister-roosterweergave en opslag
+magister.js          Validatie, API-fetch en roosterparser
+background.js        Automatisch verversen via Chrome alarms
 lib.js               Validatie en gegevensmodel
 popup.html           Kleine extensie-popup
 icons/               PNG-iconen
- tests/              Automatische tests
+tests/               Automatische tests
 ```
 
 ## Ontwikkeling en tests
@@ -59,6 +80,8 @@ Geen npm-installatie of bundler vereist. Vereist Node.js 20+ om de tests uit te 
 node --test tests/*.test.mjs
 node --check app.js
 node --check lib.js
+node --check magister.js
+node --check background.js
 ```
 
 In deze repository staat de versie 2-code in de root. Publiceer je een Chrome Web Store-release, test dan eerst in Chrome en Edge en controleer de actuele storevereisten.
