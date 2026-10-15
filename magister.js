@@ -42,11 +42,7 @@ export function scheduleUrl(gateway, from, to) {
   const origin = gatewayOrigin(gateway);
   if (!origin || !/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to))
     throw new Error('Ongeldige gateway of datum.');
-  const url = new URL('/api/proxy/api/personen/me/afspraken', origin);
-  url.searchParams.set('van', from);
-  url.searchParams.set('tot', to);
-  url.searchParams.set('status', '1');
-  return url.href;
+  return new URL('/mcp', origin).href;
 }
 
 function plainText(input, max = 260) {
@@ -70,18 +66,18 @@ function timeStamp(input) {
 export function normalizeAppointment(item) {
   if (!item || typeof item !== 'object') return null;
   const start = timeStamp(item.Start ?? item.start ?? item.startTime);
-  const end = timeStamp(item.Einde ?? item.einde ?? item.endTime);
+  const end = timeStamp(item.Einde ?? item.end ?? item.einde ?? item.endTime);
   if (start === null || end === null || end < start) return null;
   const title = plainText(item.Omschrijving ?? item.omschrijving ?? item.title ?? '', 110) ||
-    names(item.Vakken ?? item.vakken) || 'Afspraak';
+    names(item.Vakken ?? item.vakken) || plainText(item.subject,110) || 'Afspraak';
   return {
     id: String(item.Id ?? item.id ?? `${start}-${title}`).slice(0, 100),
     start, end, title,
-    subject: names(item.Vakken ?? item.vakken),
+    subject: names(item.Vakken ?? item.vakken) || plainText(item.subject,110),
     location: names(item.Lokalen ?? item.lokalen) || plainText(item.Lokatie ?? item.lokatie ?? item.location ?? '', 90),
-    teachers: names(item.Docenten ?? item.docenten),
-    homework: plainText(item.Inhoud ?? item.inhoud ?? item.HuiswerkInhoud ?? '', 650),
-    cancelled: item.IsUitgevallen === true || item.Uitgevallen === true || item.isCancelled === true || item.Status === 5
+    teachers: names(item.Docenten ?? item.docenten) || plainText(item.teacher,90),
+    homework: plainText(item.Inhoud ?? item.inhoud ?? item.HuiswerkInhoud ?? item.homework ?? '', 650),
+    cancelled: item.IsUitgevallen === true || item.Uitgevallen === true || item.isCancelled === true || item.Status === 5 || item.statusCode === 5
   };
 }
 export function parseAppointments(json) {
@@ -98,24 +94,50 @@ export function parseAppointments(json) {
     seen.add(key); return true;
   }).sort((a, b) => a.start - b.start || a.end - b.end);
 }
+// Verified gateway /mcp endpoint replaces the invalid /personen/me/afspraken proxy URL.
+// Chunk requests into 14-day periods because the MCP tool rejects larger ranges.
 export async function downloadRoster(config, now = new Date(), doFetch = fetch) {
   if (!gatewayOrigin(config?.gateway) || !validProxyKey(config?.proxyKey))
     throw new Error('Vul eerst een geldige gateway en proxy key in.');
   const {from, to} = fetchRange(now);
-  let response;
-  try {
-    response = await doFetch(scheduleUrl(config.gateway, from, to), {
-      method: 'GET', headers: {Authorization: `Bearer ${config.proxyKey}`, Accept: 'application/json'},
-      credentials: 'omit', redirect: 'error', referrerPolicy: 'no-referrer', cache: 'no-store',
-      signal: AbortSignal.timeout(20000)
-    });
-  } catch {
-    throw new Error('De gateway is niet bereikbaar. Controleer het adres en de toestemming.');
+  const base = mondayOf(now);
+  const appointments = [];
+  let partial = false;
+  for (const [start,end] of [[-7,6],[7,20]]) {
+    const dates = {from:localDate(addDays(base,start)),to:localDate(addDays(base,end))};
+    let res;
+    try {
+      res = await doFetch(scheduleUrl(config.gateway, dates.from, dates.to), {
+        method:'POST',
+        headers:{Authorization:'Bearer '+config.proxyKey,'Content-Type':'application/json',Accept:'application/json'},
+        credentials:'omit',redirect:'error',referrerPolicy:'no-referrer',cache:'no-store',
+        body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/call',
+          params:{name:'magister_get_agenda',arguments:dates}}),
+        signal:AbortSignal.timeout(20000)
+      });
+    } catch {
+      throw new Error('De gateway is niet bereikbaar. Controleer het adres en je toestemming.');
+    }
+    if (res.status===401||res.status===403)
+      throw new Error('Geen toegang. Controleer of je proxy key nog geldig is.');
+    if (!res.ok) throw new Error('Rooster ophalen mislukt (HTTP '+res.status+').');
+    let body;
+    try { body = await res.json(); } catch { throw new Error('Ongeldige JSON van gateway.'); }
+    if (body.error||body.result?.isError) {
+      let message='Rooster ophalen via MCP mislukt.';
+      try { message=body.result?.structuredContent?.error || JSON.parse(body.result.content?.[0]?.text)?.error || message; }
+      catch { /* never parse a returned token or unexpected payload */ }
+      throw new Error(String(message).slice(0,240));
+    }
+    let payload=body.result?.structuredContent;
+    if (!payload&&body.result?.content?.[0]?.text) {
+      try { payload=JSON.parse(body.result.content[0].text); } catch { /* handled below */ }
+    }
+    if (!payload||!Array.isArray(payload.events))
+      throw new Error('De MCP-server gaf geen herkenbare roostergegevens terug.');
+    if (payload.partial) partial=true;
+    appointments.push(...payload.events);
   }
-  if (response.status === 401 || response.status === 403) throw new Error('Geen toegang. Controleer of je proxy key nog geldig is.');
-  if (!response.ok) throw new Error(`Magister ophalen is mislukt (HTTP ${response.status}).`);
-  let json;
-  try { json = await response.json(); }
-  catch { throw new Error('De gateway stuurde geen geldige JSON terug.'); }
-  return {items: parseAppointments(json), from, to, updatedAt: Date.now(), error: ''};
+  return {items:parseAppointments({Items:appointments}),from,to,updatedAt:Date.now(),error:'',
+    partial};
 }
