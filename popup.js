@@ -16,6 +16,8 @@ function clock(){
 }
 function apply(){
   document.body.dataset.size=data.settings.popupSize||'normal';
+  const chosen=data.settings.theme;
+  document.documentElement.dataset.theme=chosen==='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):chosen;
   const accent={violet:'#a58bff',blue:'#63a7ff',mint:'#5edebb',pink:'#fa85bd'};
   document.documentElement.style.setProperty('--accent',accent[data.settings.accent]||accent.violet);
   $('popupHello').textContent=data.settings.name?'Hoi, '+data.settings.name+'!':'Welkom terug';
