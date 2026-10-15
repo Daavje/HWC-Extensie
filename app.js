@@ -302,7 +302,16 @@ function wireEvents(){
 }
 async function init(){
   try{data=sanitizeData(await storage.get());}catch{notify('Gegevens konden niet worden geladen; instellingen zijn tijdelijk standaard.');}
-  wireEvents();wireMagisterEvents();$('notes').value=data.notes;renderAll();renderRoster();loadMagister().catch(()=>notify('Magistergegevens konden niet worden geladen.'));setInterval(()=>{updateClock();updateTimer();},1000);
+  wireEvents();wireMagisterEvents();$('notes').value=data.notes;renderAll();renderRoster();
+  if(location.hash==='#settings'){$('settingsOpen').click();history.replaceState(null,'',location.pathname);}loadMagister().catch(()=>notify('Magistergegevens konden niet worden geladen.'));setInterval(()=>{updateClock();updateTimer();},1000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateClock();updateTimer();renderDeadlines();}});
+  if(globalThis.chrome?.storage?.onChanged)chrome.storage.onChanged.addListener((changes,area)=>{
+    if(area!=='local'||!changes[DATA_KEY])return;
+    const upcoming=sanitizeData(changes[DATA_KEY].newValue);
+    // Refresh dashboard when popup edits tasks or starts a timer.
+    if(document.activeElement!==$('notes')&&!document.querySelector('dialog[open]')){
+      data=upcoming;$('notes').value=data.notes;renderAll();
+    }
+  });
 }
 init();
