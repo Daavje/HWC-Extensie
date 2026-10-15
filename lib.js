@@ -57,7 +57,7 @@ export function sanitizeData(raw,keepTimer=true){
     focus:boundedInt(s.focus,1,120,25),break:boundedInt(s.break,1,60,5),
     density:options(s.density,['comfortable','compact','large'],'comfortable'),
     wallpaper:typeof s.wallpaper==='string'&&/^data:image\/(?:png|jpeg|webp);base64,[a-zA-Z0-9+/=]{1,600000}$/.test(s.wallpaper)?s.wallpaper:'',
-    showSections:Object.fromEntries(['roster','tasks','deadlines','notes','focus'].map(key=>[key,s.showSections?.[key]!==false])),
+    showSections:Object.fromEntries(['roster','tasks','deadlines','notes','focus','integrations','shortcuts','search'].map(key=>[key,s.showSections?.[key]!==false])),
     popupSize:options(s.popupSize,['normal','large'],'normal'),animations:s.animations!==false
   };
   const folders=Array.isArray(raw.folders)?raw.folders.slice(0,40).flatMap((item,i)=>{
