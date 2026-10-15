@@ -1,4 +1,6 @@
 import { defaultData, sanitizeData, safeUrl, safeDate, daysUntil, formatTimer, SEARCH_ENGINES } from './lib.js';
+import { setupShortcuts } from './shortcuts.js';
+import { setupCustomizer } from './customizer.js';
 import { MAGISTER_CONFIG_KEY, MAGISTER_CACHE_KEY, gatewayOrigin, validProxyKey, mondayOf, addDays, localDate, fetchRange } from './magister.js';
 
 const DATA_KEY='hwcNextData';
@@ -24,6 +26,9 @@ const fullDate=due=>new Intl.DateTimeFormat('nl-NL',{weekday:'long',day:'numeric
 const shortRelative=due=>{const days=daysUntil(due);return days<0?`${Math.abs(days)} dag${Math.abs(days)===1?'':'en'} te laat`:days===0?'Vandaag':days===1?'Morgen':`Over ${days} dagen`;};
 const element=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;};
 const notify=message=>{const toast=$('toast');toast.textContent=message;toast.classList.add('visible');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>toast.classList.remove('visible'),3300);};
+
+const shortcutUI=setupShortcuts({getData:()=>data,save,notify});
+const customUI=setupCustomizer({getData:()=>data,save,notify});
 
 // The gateway key and fetched roster are NOT part of the exported dashboard data.
 let magisterConfig = null;
@@ -186,6 +191,7 @@ function applyAppearance(){
   const chosen=data.settings.theme;
   document.documentElement.dataset.theme=chosen==='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):chosen;
   document.documentElement.dataset.accent=data.settings.accent;
+  customUI.apply();
 }
 function updateClock(){
   const now=new Date(), hour=now.getHours();
@@ -195,27 +201,8 @@ function updateClock(){
   const clock=$('clock');clock.textContent=new Intl.DateTimeFormat('nl-NL',{hour:'2-digit',minute:'2-digit',hour12:!data.settings.clock24}).format(now);clock.dateTime=now.toISOString();
   const today=$('today');today.textContent=new Intl.DateTimeFormat('nl-NL',{weekday:'long',day:'numeric',month:'long'}).format(now);today.dateTime=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
 }
-function renderShortcuts(){
-  const grid=$('shortcutGrid');grid.replaceChildren();
-  for(const shortcut of data.shortcuts){
-    const card=element('div','shortcut-card');
-    const link=element('a');link.href=shortcut.url;link.target='_self';link.className='shortcut-target';link.setAttribute('aria-label',`${shortcut.name} openen`);
-    // Link covers the tile, while edit/delete are independent buttons.
-    link.style.cssText='position:absolute;inset:0;border-radius:inherit;z-index:1;';
-    const icon=element('span','shortcut-icon',shortcut.icon);
-    const name=element('span','shortcut-name',shortcut.name);
-    const edit=element('button','shortcut-edit','✎');edit.type='button';edit.title=`${shortcut.name} bewerken`;edit.setAttribute('aria-label',edit.title);edit.style.zIndex='2';edit.onclick=()=>openShortcut(shortcut.id);
-    const remove=element('button','shortcut-delete','×');remove.type='button';remove.title=`${shortcut.name} verwijderen`;remove.setAttribute('aria-label',remove.title);remove.style.zIndex='2';remove.onclick=()=>{if(confirm(`Snelkoppeling “${shortcut.name}” verwijderen?`)){data.shortcuts=data.shortcuts.filter(s=>s.id!==shortcut.id);renderShortcuts();save();}};
-    card.append(icon,name,link,edit,remove);grid.append(card);
-  }
-  $('shortcutAdd').disabled=data.shortcuts.length>=12;
-}
-function openShortcut(linkId=null){
-  editingShortcut=linkId;
-  const s=data.shortcuts.find(item=>item.id===linkId);
-  const form=$('shortcutForm');form.reset();form.elements.name.value=s?.name||'';form.elements.url.value=s?.url||'';form.elements.icon.value=s?.icon||'';
-  $('shortcutDialogTitle').textContent=s?'Snelkoppeling bewerken':'Snelkoppeling toevoegen';$('shortcutError').textContent='';$('shortcutDialog').showModal();form.elements.name.focus();
-}
+function renderShortcuts(){shortcutUI.render();}
+function openShortcut(linkId=null){shortcutUI.open(linkId);}
 function renderTasks(){
   const list=$('taskList');list.replaceChildren();
   const filtered=data.tasks.filter(t=>filter==='all'||(filter==='done'?t.done:!t.done)).sort((a,b)=>Number(a.done)-Number(b.done)||(a.due||'9999').localeCompare(b.due||'9999')||(a.priority===b.priority?0:a.priority==='high'?-1:1)||b.createdAt-a.createdAt);
@@ -268,17 +255,9 @@ function toggleTimer(){const t=data.timer;if(t.running){t.remaining=remainingTim
 function renderAll(){applyAppearance();updateClock();renderShortcuts();renderTasks();renderDeadlines();updateTimer();}
 
 function wireEvents(){
-  $('settingsOpen').addEventListener('click',()=>{const s=data.settings,f=$('settingsForm');f.elements.name.value=s.name;f.elements.theme.value=s.theme;f.elements.accent.value=s.accent;f.elements.engine.value=s.engine;f.elements.clock24.checked=s.clock24;f.elements.focus.value=s.focus;f.elements.break.value=s.break;$('settingsError').textContent='';$('settingsDialog').showModal();});
+  $('settingsOpen').addEventListener('click',()=>{const s=data.settings,f=$('settingsForm');f.elements.name.value=s.name;f.elements.theme.value=s.theme;f.elements.accent.value=s.accent;f.elements.engine.value=s.engine;f.elements.clock24.checked=s.clock24;f.elements.focus.value=s.focus;f.elements.break.value=s.break;customUI.prepare();$('settingsError').textContent='';$('settingsDialog').showModal();});
   $('searchForm').addEventListener('submit',event=>{event.preventDefault();const q=$('searchInput').value.trim();if(q)window.location.assign(SEARCH_ENGINES[data.settings.engine]+encodeURIComponent(q));});
-  $('shortcutAdd').addEventListener('click',()=>openShortcut());
-  $('shortcutForm').addEventListener('submit',event=>{
-    event.preventDefault();const f=event.currentTarget,name=f.elements.name.value.trim(),url=safeUrl(f.elements.url.value),icon=f.elements.icon.value.trim()||'🔗';
-    if(!name||!url){$('shortcutError').textContent='Vul een naam en een geldige http(s)-website in.';return;}
-    const item={id:editingShortcut||id(),name:name.slice(0,32),url,icon:icon.slice(0,8)};
-    if(editingShortcut){const idx=data.shortcuts.findIndex(s=>s.id===editingShortcut);if(idx<0)return;data.shortcuts[idx]=item;}
-    else if(data.shortcuts.length<12)data.shortcuts.push(item);else{$('shortcutError').textContent='Maximaal 12 snelkoppelingen.';return;}
-    $('shortcutDialog').close();renderShortcuts();save();notify('Snelkoppeling opgeslagen.');
-  });
+  shortcutUI.bind();customUI.bind();
   $('taskAdd').addEventListener('click',()=>openTask());$('deadlineAdd').addEventListener('click',()=>openTask());
   $('taskForm').addEventListener('submit',event=>{
     event.preventDefault();const f=event.currentTarget,title=f.elements.title.value.trim(),rawDue=f.elements.due.value;
@@ -296,7 +275,7 @@ function wireEvents(){
     event.preventDefault();const f=event.currentTarget,focus=Number(f.elements.focus.value),rest=Number(f.elements.break.value);
     if(!Number.isInteger(focus)||focus<1||focus>120||!Number.isInteger(rest)||rest<1||rest>60){$('settingsError').textContent='Gebruik 1–120 minuten focus en 1–60 minuten pauze.';return;}
     const oldFocus=data.settings.focus,oldBreak=data.settings.break;
-    data.settings={name:f.elements.name.value.trim().slice(0,30),theme:f.elements.theme.value,accent:f.elements.accent.value,engine:f.elements.engine.value,clock24:f.elements.clock24.checked,focus,break:rest};
+    data.settings={...data.settings,name:f.elements.name.value.trim().slice(0,30),theme:f.elements.theme.value,accent:f.elements.accent.value,engine:f.elements.engine.value,clock24:f.elements.clock24.checked,focus,break:rest};customUI.saveSettings();
     if(!data.timer.running&&((data.timer.mode==='focus'&&focus!==oldFocus)||(data.timer.mode==='break'&&rest!==oldBreak)))data.timer.remaining=(data.timer.mode==='focus'?focus:rest)*60;
     $('settingsDialog').close();renderAll();save();notify('Instellingen opgeslagen.');
   });
