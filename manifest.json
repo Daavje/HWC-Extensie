@@ -1,15 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "HWC Dashboard Next",
-  "short_name": "HWC Next",
-  "description": "HWC-dashboard met automatisch Magister-rooster, taken, deadlines, notities en focus.",
-  "version": "2.1.0",
+  "name": "HWC Dashboard Studio",
+  "short_name": "HWC Studio",
+  "description": "Persoonlijke HWC-startpagina met mappen, iconen, Magister-rooster, focus, taken en uitgebreide aanpassingen.",
+  "version": "3.0.0",
   "minimum_chrome_version": "120",
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
   "action": {
-    "default_title": "HWC Dashboard openen",
+    "default_title": "HWC Studio - minidashboard",
     "default_popup": "popup.html"
   },
   "icons": {
@@ -20,7 +20,8 @@
   "permissions": [
     "storage",
     "alarms",
-    "permissions"
+    "permissions",
+    "favicon"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
@@ -31,5 +32,8 @@
   "background": {
     "service_worker": "background.js",
     "type": "module"
-  }
+  },
+  "optional_permissions": [
+    "bookmarks"
+  ]
 }
