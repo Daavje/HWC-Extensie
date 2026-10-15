@@ -44,3 +44,12 @@ footer{border-top:1px solid var(--line);display:flex;align-items:center;justify-
 #popupToast{position:sticky;bottom:0;left:0;width:100%;font-size:12px;text-align:center;background:#453576;color:white;display:none;padding:9px}
 #popupToast.visible{display:block}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+:root[data-theme=light]{color-scheme:light;--base:#f1f4fb;--panel:#fff;--line:#1b2f501f;--muted:#64718b;--text:#17243f}
+:root[data-theme=light] body{color:var(--text);background:radial-gradient(ellipse at 90% -15%,#b6a7ef5e,transparent 58%),var(--base)}
+:root[data-theme=light] .brand strong,:root[data-theme=light] .round,:root[data-theme=light] .quick-link,:root[data-theme=light] .minor,
+:root[data-theme=light] #linkFilter,:root[data-theme=light] .task-add input{color:var(--text)}
+:root[data-theme=light] .folder-chips button{color:var(--text);background:#eaebf8}
+:root[data-theme=light] .tabs{background:#e6eafa}
+:root[data-theme=light] .quick-link:hover{background:#e9eafa}
+:root[data-theme=light] .tabs button[aria-selected=true]{color:#fff}
