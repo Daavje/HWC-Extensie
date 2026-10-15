@@ -39,3 +39,37 @@ test('Imported data is validated and dangerous fields ignored',()=>{
   assert.equal(result.timer.running,false);
   assert.equal(result.notes,'hello');
 });
+
+test('Folders and customizations are sanitized and survive roundtrip',()=>{
+  const raw=defaultData();
+  raw.folders=[{id:'math',name:'Wiskunde',icon:'📐'}];
+  raw.shortcuts=[{id:'test',name:'Huiswerk',url:'https://example.org/',icon:'📚',
+    iconType:'auto',folderId:'math',pinned:true}];
+  raw.settings.density='compact';
+  raw.settings.popupSize='large';
+  raw.settings.showSections={roster:false,integrations:false};
+  const clean=sanitizeData(raw);
+  assert.equal(clean.folders[0].name,'Wiskunde');
+  assert.equal(clean.shortcuts[0].folderId,'math');
+  assert.equal(clean.shortcuts[0].pinned,true);
+  assert.equal(clean.settings.density,'compact');
+  assert.equal(clean.settings.popupSize,'large');
+  assert.equal(clean.settings.showSections.roster,false);
+  assert.equal(clean.settings.showSections.integrations,false);
+  assert.equal(clean.settings.showSections.notes,true);
+});
+test('Invalid uploaded icons and path injection are removed',()=>{
+  const data=sanitizeData({shortcuts:[{
+    id:'a',name:'Safe',url:'https://example.org/',folderId:'unknown',
+    iconType:'upload',image:'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4='
+  }]});
+  assert.equal(data.shortcuts[0].folderId,'');
+  assert.equal(data.shortcuts[0].iconType,'auto');
+  assert.equal(data.shortcuts[0].image,'');
+});
+test('Old shortcuts still load and max 300 are retained',()=>{
+  const old={version:2,shortcuts:[{name:'Old',url:'https://example.org',icon:'📘'}]};
+  assert.equal(sanitizeData(old).shortcuts[0].icon,'📘');
+  const huge={shortcuts:Array.from({length:500},(_,i)=>({name:'Link'+i,url:'https://example.org/'+i}))};
+  assert.equal(sanitizeData(huge).shortcuts.length,300);
+});
