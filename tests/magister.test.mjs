@@ -22,12 +22,10 @@ test('Fetch range covers four calendar weeks and Monday boundaries', () => {
   assert.deepEqual(fetchRange(new Date(2026,9,15)),{from:'2026-10-05',to:'2026-11-01'});
 });
 
-test('Proxy URL queries official Magister afspraken API', () => {
+test('Verified MCP endpoint replaces invalid /personen/me/afspraken endpoint', () => {
   const url=new URL(scheduleUrl(gateway,'2026-10-05','2026-11-01'));
   assert.equal(url.origin,gateway);
-  assert.equal(url.pathname,'/api/proxy/api/personen/me/afspraken');
-  assert.equal(url.searchParams.get('van'),'2026-10-05');
-  assert.equal(url.searchParams.get('tot'),'2026-11-01');
+  assert.equal(url.pathname,'/mcp');
 });
 
 test('Appointments display subjects and homework without HTML execution', () => {
@@ -44,19 +42,42 @@ test('Appointments display subjects and homework without HTML execution', () => 
   assert.throws(()=>parseAppointments({Error:'not a roster'}),/geen herkenbare/);
 });
 
-test('Fetch passes proxy key in bearer header and never in URL', async () => {
-  let captured;
-  const result = await downloadRoster({gateway, proxyKey:KEY}, new Date(2026,9,15), async (url, options) => {
-    captured={url, options};
-    return {ok:true,status:200,async json(){return {Items:[]};}};
+test('Fetches four weeks as two verified MCP requests with secret only in header', async () => {
+  const calls=[];
+  const result=await downloadRoster({gateway,proxyKey:KEY},new Date(2026,9,15),async(url,options)=>{
+    calls.push({url,options,body:JSON.parse(options.body)});
+    return {ok:true,status:200,async json(){return {jsonrpc:'2.0',id:1,result:{
+      structuredContent:{events:[],partial:false,totalCount:0}
+    }}}};
   });
   assert.equal(result.items.length,0);
-  assert.equal(captured.options.headers.Authorization, `Bearer ${KEY}`);
-  assert.ok(!captured.url.includes(KEY));
-  assert.equal(captured.options.redirect,'error');
-  assert.equal(captured.options.credentials,'omit');
+  assert.equal(calls.length,2);
+  assert.equal(calls[0].body.params.arguments.from,'2026-10-05');
+  assert.equal(calls[0].body.params.arguments.to,'2026-10-18');
+  assert.equal(calls[1].body.params.arguments.from,'2026-10-19');
+  assert.equal(calls[1].body.params.arguments.to,'2026-11-01');
+  for(const c of calls){
+    assert.equal(c.url,gateway+'/mcp');
+    assert.equal(c.options.method,'POST');
+    assert.equal(c.options.headers.Authorization,'Bearer '+KEY);
+    assert.ok(!c.url.includes(KEY));
+    assert.equal(c.options.redirect,'error');
+    assert.equal(c.options.credentials,'omit');
+  }
 });
 
 test('Unauthorized proxy response gives a clear error without exposing credentials', async () => {
   await assert.rejects(downloadRoster({gateway, proxyKey:KEY},new Date(),async()=>({status:401,ok:false})),/Geen toegang/);
+});
+
+test('MCP result parses Magister lesson fields used by real gateway',()=>{
+ const result=parseAppointments({Items:[{
+   id:2461110,start:'2026-10-20T09:30:00.0000000Z',end:'2026-10-20T10:20:00.0000000Z',
+   subject:'scheikunde',description:'sk - kay - v5.sk3',location:'214',teacher:'J. Kayhan',
+   homework:'Maak alle oefenopgaven over pH',statusCode:3
+ }]});
+ assert.equal(result.length,1);
+ assert.equal(result[0].subject,'scheikunde');
+ assert.equal(result[0].location,'214');
+ assert.equal(result[0].homework,'Maak alle oefenopgaven over pH');
 });
