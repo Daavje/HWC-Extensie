@@ -5,6 +5,13 @@ export function setupCustomizer({getData,save,notify}) {
   const apply=()=>{
     const s=getSettings();
     const root=document.documentElement;
+    if(s.customAccent&&/^#[0-9a-fA-F]{6}$/.test(s.customAccent)){
+      const rgb=[1,3,5].map(i=>parseInt(s.customAccent.slice(i,i+2),16));
+      root.style.setProperty('--accent',s.customAccent);
+      root.style.setProperty('--accent-rgb',rgb.join(','));
+    }else{
+      root.style.removeProperty('--accent');root.style.removeProperty('--accent-rgb');
+    }
     root.dataset.density=s.density||'comfortable';
     root.dataset.animations=s.animations===false?'off':'on';
     root.style.setProperty('--user-wallpaper',s.wallpaper?'url("'+s.wallpaper+'")':'none');
@@ -17,6 +24,8 @@ export function setupCustomizer({getData,save,notify}) {
   };
   const prepare=()=>{
     const s=getSettings(),f=$('settingsForm');
+    f.elements.useCustomAccent.checked=Boolean(s.customAccent);
+    f.elements.customAccent.value=s.customAccent||'#9777ff';
     f.elements.density.value=s.density||'comfortable';
     f.elements.popupSize.value=s.popupSize||'normal';
     f.elements.animations.checked=s.animations!==false;
@@ -27,6 +36,7 @@ export function setupCustomizer({getData,save,notify}) {
   };
   const saveSettings=()=>{
     const f=$('settingsForm'),s=getSettings();
+    s.customAccent=f.elements.useCustomAccent.checked?f.elements.customAccent.value:'';
     s.density=f.elements.density.value;
     s.popupSize=f.elements.popupSize.value;
     s.animations=f.elements.animations.checked;
