@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" aria-label="HWC Dashboard logo">
+  <defs><linearGradient id="bg" x1="10" y1="10" x2="118" y2="118" gradientUnits="userSpaceOnUse"><stop stop-color="#162548"/><stop offset="1" stop-color="#090f22"/></linearGradient>
+  <linearGradient id="glow" x1="20" y1="20" x2="114" y2="114" gradientUnits="userSpaceOnUse"><stop stop-color="#68b4ff"/><stop offset=".55" stop-color="#9777ff"/><stop offset="1" stop-color="#ec89f0"/></linearGradient>
+  <filter id="shadow"><feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#12113e" flood-opacity=".65"/></filter></defs>
+  <rect x="4" y="4" width="120" height="120" rx="31" fill="url(#bg)" stroke="#8292de" stroke-opacity=".35" stroke-width="2"/>
+  <path d="M32 34v59M79 34v59M32 63h47" stroke="url(#glow)" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" filter="url(#shadow)"/>
+  <path d="M99 23l4.2 10.8L114 38l-10.8 4.2L99 53l-4.2-10.8L84 38l10.8-4.2Z" fill="#c3a9ff"/>
+  <circle cx="98" cy="88" r="10" fill="#9b7bff"/>
+  <circle cx="114" cy="73" r="3" fill="#74d6ff"/>
+</svg>
