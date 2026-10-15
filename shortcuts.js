@@ -26,6 +26,19 @@ export const APP_CATALOG = [
   ['Wikipedia','https://nl.wikipedia.org/','🌐','Overig'],
   ['Kahoot','https://kahoot.it/','🎯','School']
 ];
+const ICON_TAGS={
+  '📚':'boeken school magister huiswerk', '🏫':'school gebouw', '🎓':'studie diploma', '📖':'lezen boeken', '📐':'wiskunde meetkunde', '🔬':'wetenschap biologie','🧪':'scheikunde natuurkunde','🧬':'dna biologie','🧮':'rekenen','📝':'notities taak',
+  '📅':'kalender agenda datum', '✅':'check todo taak klaar', '⏰':'klok tijd timer',
+  '📁':'map folder bestanden', '📂':'map folder open', '☁️':'cloud drive opslag',
+  '💻':'laptop programmeren computer', '🌐':'web internet browser', '⚙️':'settings instellingen',
+  '🧠':'leren studeren ai', '🤖':'robot ai chatgpt','✨':'ster sparkle magie','🚀':'raket snelheid launch',
+  '✉️':'email mail outlook','📨':'mail berichten gmail','👥':'teams samenwerken personen',
+  '🎤':'microfoon zingen audio', '🎧':'koptelefoon muziek spotify', '🎵':'muziek spotify',
+  '🎮':'games gaming discord','▶️':'video youtube','📺':'video televisie',
+  '🎨':'kunst tekenen design', '🛒':'winkelen shop','📰':'nieuws krant',
+  '🗺️':'maps kaart locatie','📍':'locatie pin', '🚴':'fiets', '🍕':'eten pizza',
+  '🌞':'zon weer licht', '🌙':'maan nacht donker', '💜':'hart paars liefde', '🏆':'prijs trofee winnaar'
+};
 export const ICON_LIBRARY = [
   '📚','🏫','🎓','📖','📐','🔬','🧪','🧬','🧮','📝','📓','✏️','📅','🗓️','✅','⏰','⌛','📌','📎','📊',
   '💻','🖥️','⌨️','📱','📡','🌐','🔗','⚙️','🧠','🤖','✨','🚀','🔒','💡','📁','📂','🗄️','☁️','🔍','🔧',
@@ -67,7 +80,13 @@ export function renderIcon(iconData,klass='shortcut-icon'){
   if(type==='upload'&&/^data:image\/(?:png|jpeg|webp);base64,/i.test(iconData.image||'')){
     const img=el('img','shortcut-image');img.src=iconData.image;img.alt='';img.onerror=fallback;wrap.append(img);
   } else if(type==='auto' && faviconURL(iconData.url)){
-    const img=el('img','shortcut-image');img.src=faviconURL(iconData.url);img.alt='';img.onerror=fallback;wrap.append(img);
+    const img=el('img','shortcut-image');img.src=faviconURL(iconData.url);img.alt='';
+    img.onerror=()=>{
+      if(img.dataset.fallbackTried){fallback();return;}
+      img.dataset.fallbackTried='true';
+      try{img.src=new URL('/favicon.ico',iconData.url).href;}catch{fallback();}
+    };
+    wrap.append(img);
   } else fallback();
   return wrap;
 }
@@ -109,7 +128,7 @@ export function setupShortcuts({getData,save,notify}) {
   const drawIcons=()=>{
     const list=$('iconCatalog');list.replaceChildren();
     const query=$('iconSearch').value.trim().toLowerCase();
-    const results=ICON_LIBRARY.filter(icon=>!query||ICON_LIBRARY.indexOf(icon).toString().includes(query)||icon.includes(query));
+    const results=ICON_LIBRARY.filter(icon=>!query||(ICON_TAGS[icon]||'').includes(query)||icon.includes(query));
     // The catalog also accepts any Unicode emoji pasted into the icon field.
     if(!results.length){
       const p=el('p','hint','Geen iconen gevonden. Je kunt ook zelf een emoji plakken.');
@@ -208,9 +227,9 @@ export function setupShortcuts({getData,save,notify}) {
     persist();notify(name+' toegevoegd.');
   };
   async function importBookmarks() {
-    if(!globalThis.chrome?.bookmarks){notify('Bladwijzers zijn niet beschikbaar.');return;}
     const allowed=await chrome.permissions.request({permissions:['bookmarks']});
     if(!allowed){notify('Toegang tot bladwijzers is geweigerd.');return;}
+    if(!globalThis.chrome?.bookmarks){notify('Bladwijzers zijn niet beschikbaar.');return;}
     const trees=await chrome.bookmarks.getTree();
     let added=0;
     const existing=new Set(data().shortcuts.map(x=>x.url));
