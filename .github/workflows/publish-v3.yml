@@ -1,0 +1,61 @@
+name: Publish HWC Dashboard Studio v3.0.0
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-v3.yml'
+      - 'RELEASE_NOTES_v3.0.0.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-hwc-dashboard-studio-v3.0.0
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'Daavje/HWC-Extensie' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate code and Chrome assets
+        run: |
+          npm run check
+          node -e "if (require('./manifest.json').version !== '3.0.0') process.exit(1)"
+
+      - name: Package installable Chrome/Edge extension
+        run: |
+          mkdir -p dist
+          zip -q -r dist/HWC-Dashboard-Studio-v3.0.0.zip \
+            manifest.json index.html popup.html \
+            app.js lib.js magister.js background.js shortcuts.js customizer.js popup.js \
+            styles.css studio.css popup.css \
+            assets/hwc-mark.svg icons
+          unzip -t dist/HWC-Dashboard-Studio-v3.0.0.zip
+          unzip -l dist/HWC-Dashboard-Studio-v3.0.0.zip
+
+      - name: Create GitHub release and attach ZIP
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=v3.0.0
+          ASSET=dist/HWC-Dashboard-Studio-v3.0.0.zip
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ASSET" --clobber
+          else
+            gh release create "$TAG" "$ASSET" \
+              --title "HWC Dashboard Studio v3.0.0" \
+              --notes-file RELEASE_NOTES_v3.0.0.md \
+              --target "$GITHUB_SHA" \
+              --latest
+          fi
