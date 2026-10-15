@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0e1528">
-  <title>HWC Dashboard Next</title>
+  <title>HWC Dashboard Studio</title>
   <link rel="icon" type="image/png" href="icons/icon48.png">
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="app.js"></script>
@@ -16,7 +16,7 @@
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="index.html" aria-label="HWC Dashboard - startpagina">
-        <span class="brand-symbol">H</span>
+        <img class="brand-symbol brand-logo" src="assets/hwc-mark.svg" alt="">
         <span><strong>HWC<span class="brand-accent">.</span></strong><small>YOUR SPACE</small></span>
       </a>
       <div class="top-actions">
@@ -47,11 +47,19 @@
       </form>
 
       <section class="shortcuts-section" aria-labelledby="shortcutsTitle">
-        <div class="section-heading"><div><div class="eyebrow">DIRECT NAAR</div><h2 id="shortcutsTitle">Jouw snelkoppelingen</h2></div><button id="shortcutAdd" class="text-button" type="button">+ Toevoegen</button></div>
+        <div class="section-heading"><div><div class="eyebrow">JOUW WORKSPACE</div><h2 id="shortcutsTitle">Snelkoppelingen &amp; mappen</h2></div>
+          <div class="shortcut-actions"><button id="bookmarksImport" class="small-button" type="button" title="Bladwijzers uit Chrome/Edge importeren">↓ Bladwijzers</button><button id="folderNew" class="small-button" type="button">+ Map</button><button id="shortcutAdd" class="text-button" type="button">+ Link</button></div></div>
+        <div class="folder-toolbar"><nav id="shortcutBread" aria-label="Mapnavigatie"></nav><div><button id="folderBack" class="text-button" type="button" hidden>← Terug</button><button id="folderEdit" class="text-button" type="button" hidden>✎ Map aanpassen</button></div></div>
         <div id="shortcutGrid" class="shortcut-grid"></div>
-        <p class="hint">Tip: klik op het potloodje bij een snelkoppeling om deze aan te passen.</p>
+        <p class="hint">Sleep links om de volgorde te veranderen · <span id="shortcutTotal">0 links</span> · eigen afbeeldingen, emoji's en automatische site-iconen.</p>
       </section>
 
+      <section id="integrationsSection" class="panel integrations-panel" aria-labelledby="integrationsTitle">
+        <div class="panel-head"><div><div class="eyebrow">ONTDEK APPS</div><h2 id="integrationsTitle">Snelle integraties</h2></div>
+          <label class="search-integrations"><span class="sr-only">Zoek integraties</span><input id="integrationsSearch" placeholder="Zoek apps..." maxlength="60"></label></div>
+        <p class="panel-foot">Voeg populaire diensten met één klik toe als snelkoppeling. Je logt bij elke dienst zelf in.</p>
+        <div id="integrationsCatalog" class="integrations-catalog"></div>
+      </section>
       <section class="panel roster-panel" aria-labelledby="rosterTitle">
         <div class="panel-head roster-header">
           <div><div class="eyebrow">AUTOMATISCH UIT MAGISTER</div><h2 id="rosterTitle">Mijn rooster <span id="rosterConnection" class="roster-badge">Niet gekoppeld</span></h2></div>
@@ -94,7 +102,7 @@
         </section>
       </div>
     </main>
-    <footer><span>HWC Dashboard Next <span class="muted">· gemaakt voor een overzichtelijke schooldag</span></span><a href="https://github.com/Daavje/HWC-Extensie" target="_blank" rel="noopener noreferrer">Oorspronkelijke extensie ↗</a></footer>
+    <footer><span>HWC Dashboard Studio <span class="muted">· gemaakt voor een overzichtelijke schooldag</span></span><a href="https://github.com/Daavje/HWC-Extensie" target="_blank" rel="noopener noreferrer">Oorspronkelijke extensie ↗</a></footer>
   </div>
 
   <dialog id="shortcutDialog" class="modal" aria-labelledby="shortcutDialogTitle">
@@ -102,9 +110,27 @@
       <div class="modal-title"><h2 id="shortcutDialogTitle">Snelkoppeling toevoegen</h2><button class="close-button" type="button" data-close="shortcutDialog" aria-label="Sluiten">×</button></div>
       <label>Naam<input name="name" required maxlength="32" placeholder="Bijv. Moodle"></label>
       <label>Website URL<input name="url" required maxlength="1000" placeholder="https://voorbeeld.nl" inputmode="url"></label>
-      <label>Icoon (emoji)<input name="icon" maxlength="8" placeholder="🔗"></label>
+      <div class="form-split"><label>Icoonbron<select name="iconType"><option value="auto">Automatisch (website/favicon)</option><option value="emoji">Icoonbibliotheek / emoji</option><option value="upload">Mijn afbeelding uploaden</option></select></label>
+        <div class="icon-preview-holder"><span>Voorbeeld</span><div id="shortcutIconPreview"></div></div></div>
+      <div id="iconCatalogArea"><label>Emoji of icoon<input name="icon" maxlength="8" placeholder="🔗"></label>
+        <label>Zoeken in iconen<input id="iconSearch" type="search" placeholder="Kies hieronder of plak zelf een emoji"></label>
+        <div id="iconCatalog" class="icon-catalog" role="group" aria-label="Icoonbibliotheek"></div></div>
+      <div id="iconUploadArea" hidden><label>Upload eigen afbeelding<input id="iconFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></label>
+        <p class="settings-tip">Je afbeelding wordt lokaal verkleind en veilig opgeslagen.</p></div>
+      <label>In map<select name="folderId"><option value="">Geen map (Start)</option></select></label>
+      <label class="checkbox-row"><input name="pinned" type="checkbox"> Vastzetten in popup</label>
       <p id="shortcutError" class="form-error" role="alert"></p>
       <div class="modal-actions"><button type="button" class="secondary-button" data-close="shortcutDialog">Annuleren</button><button class="primary-button" type="submit">Opslaan</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="folderDialog" class="modal" aria-labelledby="folderTitle">
+    <form id="folderForm" class="modal-form" novalidate>
+      <div class="modal-title"><h2 id="folderTitle">Map maken</h2><button class="close-button" type="button" data-close="folderDialog" aria-label="Sluiten">×</button></div>
+      <label>Naam van de map<input name="name" maxlength="32" required placeholder="Bijv. School, Muziek, Werk"></label>
+      <label>Map-icoon<input name="icon" maxlength="8" placeholder="📁"></label>
+      <p id="folderError" class="form-error" role="alert"></p>
+      <div class="modal-actions"><button id="folderDelete" class="secondary-button danger-button" type="button" hidden>Map verwijderen</button><button class="primary-button" type="submit">Opslaan</button></div>
     </form>
   </dialog>
 
@@ -128,6 +154,22 @@
       <label>Zoekmachine<select name="engine"><option value="google">Google</option><option value="duckduckgo">DuckDuckGo</option><option value="bing">Bing</option></select></label>
       <label class="checkbox-row"><input type="checkbox" name="clock24" checked> 24-uursklok gebruiken</label>
       <div class="form-split"><label>Focus (min)<input name="focus" type="number" min="1" max="120" step="1"></label><label>Pauze (min)<input name="break" type="number" min="1" max="60" step="1"></label></div>
+      <fieldset class="custom-settings"><legend>Indeling &amp; uiterlijk</legend>
+        <label>Snelkoppelingen-layout<select name="density"><option value="comfortable">Normaal</option><option value="compact">Compact</option><option value="large">Grote tegels</option></select></label>
+        <label>Popup-formaat<select name="popupSize"><option value="normal">Normaal</option><option value="large">Extra groot</option></select></label>
+        <label class="checkbox-row"><input type="checkbox" name="animations"> Animaties gebruiken</label>
+        <p class="settings-tip">Welke onderdelen wil je zien?</p>
+        <div class="widgets-switches">
+          <label class="checkbox-row"><input type="checkbox" name="show-roster"> Rooster</label>
+          <label class="checkbox-row"><input type="checkbox" name="show-tasks"> Taken</label>
+          <label class="checkbox-row"><input type="checkbox" name="show-deadlines"> Deadlines</label>
+          <label class="checkbox-row"><input type="checkbox" name="show-notes"> Notities</label>
+          <label class="checkbox-row"><input type="checkbox" name="show-focus"> Focus</label>
+        </div>
+        <label>Achtergrondfoto uploaden<input id="wallpaperFile" type="file" accept="image/png,image/jpeg,image/webp"></label>
+        <p id="wallpaperStatus" class="settings-tip">Standaardachtergrond</p>
+        <button id="wallpaperRemove" class="small-button" type="button">Achtergrond verwijderen</button>
+      </fieldset>
       <div class="setting-import"><button type="button" id="exportButton" class="secondary-button">↓ Exporteer gegevens</button><label class="import-label" for="importFile">↑ Importeer gegevens<input id="importFile" type="file" accept="application/json,.json" hidden></label></div>
       <p class="settings-tip">Je gegevens blijven lokaal in deze browser. Importeer alleen een back-up die je vertrouwt; importeren vervangt de huidige gegevens.</p>
       <p id="settingsError" class="form-error" role="alert"></p>
