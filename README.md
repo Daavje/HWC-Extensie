@@ -1,4 +1,4 @@
-# HWC Dashboard Next ✦
+# HWC Dashboard Studio 3.0 ✦
 
 Een vernieuwde, persoonlijke startpagina voor leerlingen van het Hermann Wesselink College. Gebaseerd op het idee van [HWC-Extensie](https://github.com/Daavje/HWC-Extensie), maar volledig opnieuw opgebouwd met een responsive dashboard en extra functies.
 
@@ -7,13 +7,18 @@ Een vernieuwde, persoonlijke startpagina voor leerlingen van het Hermann Wesseli
 - **Nieuwe-tabbladpagina** voor Chrome en Microsoft Edge (Manifest V3).
 - **Automatisch Magister-rooster** via een eigen of vertrouwde [Magister Auth Gateway](https://github.com/Daavje/magister-auth-gateway): lessen, tijden, lokalen, docenten, lesinhoud en uitval (wanneer Magister deze gegevens levert).
 - **Automatisch verversen:** bij openen indien nodig en elke 15 minuten op de achtergrond zolang de browser draait; tot vier weken rooster (vorige, huidige en twee komende weken).
-- **Aanpasbare snelkoppelingen** (max. 12), standaard Magister, Outlook, Workspace365, ChatGPT, DeepL en YouTube. Links bewerken en verwijderen.
+- **Onbeperkt(er) snelkoppelingen:** tot 300 links en 40 mappen; maak, hernoem en verwijder mappen zonder je links te wissen. Sleep links om ze binnen een map te herschikken.
+- **Icoonbibliotheek en eigen afbeeldingen:** tientallen emoji-iconen, zoeken op thema, automatische Chrome-favicons, veilige eigen uploads (lokaal verkleind).
+- **Bladwijzers importeren:** optionele Chrome/Edge-bookmarktoestemming, alleen na een klik.
+- **Integratiecatalogus:** één klik om Magister, Outlook, Teams, Drive, Google Agenda, ChatGPT, Notion, Todoist, Spotify en meer als snelkoppelingen toe te voegen. Dit zijn links, geen afzonderlijke API-aanmeldingen.
+- **Popup als mini-dashboard:** door je mappen navigeren, favoriete snelkoppelingen openen, taken toevoegen/afvinken, focustimer starten/pauzeren en komende Magister-lessen zien.
+- **Extra personalisatie:** eigen achtergrondafbeelding, layout-dichtheid, grotere/kleinere popup, animaties en zichtbaarheid van widgets/zoekbalk/integraties.
 - **Takenlijst** met afvinken, belangrijke taken en filters.
 - **Deadlines** op basis van taken met een datum; achterstallige deadlines worden getoond.
 - **Persoonlijke notities** met automatisch lokaal opslaan.
 - **Focustimer** met instelbare focus- en pauzeduur, pauzeren en hervatten. De tijd blijft doorlopen als je het tabblad sluit; bij heropenen zie je de resterende tijd.
 - **Zoekbalk** met Google, DuckDuckGo of Bing. Sneltoetsen: `Ctrl+K` / `Cmd+K` en `/` om te zoeken, `N` om een taak toe te voegen.
-- **Personalisatie:** je naam, lichte/donkere modus, accentkleur, 12/24-uursklok.
+- **Personalisatie:** je naam, lichte/donkere modus, accentkleur, 12/24-uursklok, wallpaper en widgetzichtbaarheid.
 - **JSON-back-up** voor export/import van je taken, notities, links en instellingen.
 - **Responsief en toegankelijk:** werkt ook op kleinere schermen, toetsenbordbediening, minder animatie bij `prefers-reduced-motion`.
 
@@ -30,13 +35,20 @@ Een vernieuwde, persoonlijke startpagina voor leerlingen van het Hermann Wesseli
 
 **Bestaande extensie?** Schakel je oude HWC-extensie uit, omdat er maar één nieuw-tabbladvervanger tegelijk actief kan zijn. De instellingen uit versie 1 worden niet automatisch overgezet.
 
+## Wat is technisch verbeterd in 3.0?
+- De oude `/api/proxy/api/personen/me/afspraken` route was fout voor de gebruikte gateway. In 3.0 gebruiken we het werkende **MCP-endpoint** `POST /mcp` met de tool `magister_get_agenda`. We vragen twee blokken van 14 dagen op en vernieuwen de cache via het service worker-alarm.
+- Sleutels worden uitsluitend in lokale extensie-opslag bewaard, niet meegenomen in een JSON-back-up.
+- De extensie voegt alleen `favicon` toe als standaardrecht. Voor het lezen van bladwijzers wordt **expliciet** toestemming gevraagd.
+- Onder `npm run check` draaien syntaxcontrole en geautomatiseerde tests.
+- Oude versie-2-back-ups blijven bruikbaar; nieuwe velden worden veilig gevalideerd.
+
 ## Magister instellen (eenmalig)
 
 Deze functie gebruikt de **Managed Proxy API Key** uit de [Magister Auth Gateway](https://github.com/Daavje/magister-auth-gateway). Je hoeft geen wachtwoord in de extensie in te voeren.
 
 1. Zorg voor een **werkende gateway via HTTPS**. Gebruik een eigen installatie of uitsluitend een gateway waarvan je de beheerder vertrouwt. Een GitHub-repository op zichzelf is **geen** draaiende gateway.
 2. Open het gateway-dashboard, meld je aan via de door de gateway ondersteunde Magister/Discipulus-authenticatie en maak een **Proxy Key** aan (`mag_sk_...`).
-3. Open een nieuw tabblad met HWC Dashboard Next, klik bij **Mijn rooster → Koppelen**.
+3. Open een nieuw tabblad met HWC Dashboard Studio, klik bij **Mijn rooster → Koppelen**.
 4. Vul de volledige gateway-origin in, bijvoorbeeld `https://gateway.voorbeeld.nl`, en plak de Proxy Key. Gebruik geen pad achter de domeinnaam.
 5. Klik **Verbinden & ophalen** en geef je browser toestemming om dit specifieke domein te benaderen.
 6. Als de gateway de Magister-API ondersteunt, verschijnen je afspraken automatisch. In de extensie kun je eerdere en komende weken bekijken en handmatig verversen.
