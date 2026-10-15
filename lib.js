@@ -41,7 +41,7 @@ const options=(value,allowed,fallback)=>allowed.includes(value)?value:fallback;
 const boundedInt=(n,min,max,fallback)=>Number.isInteger(Number(n))&&Number(n)>=min&&Number(n)<=max?Number(n):fallback;
 export function defaultData(){return{
   version:2,
-  settings:{name:'',theme:'system',accent:'violet',engine:'google',clock24:true,focus:25,break:5,density:'comfortable',wallpaper:'',showSections:{roster:true,tasks:true,deadlines:true,notes:true,focus:true},popupSize:'normal',animations:true},
+  settings:{name:'',theme:'system',accent:'violet',engine:'google',clock24:true,focus:25,break:5,density:'comfortable',wallpaper:'',customAccent:'',showSections:{roster:true,tasks:true,deadlines:true,notes:true,focus:true},popupSize:'normal',animations:true},
   shortcuts:DEFAULT_SHORTCUTS.map(s=>({...s,iconType:'auto',folderId:'',pinned:true})),folders:[],
   tasks:[],notes:'',timer:{mode:'focus',remaining:25*60,running:false,endAt:null}
 };}
@@ -57,6 +57,7 @@ export function sanitizeData(raw,keepTimer=true){
     focus:boundedInt(s.focus,1,120,25),break:boundedInt(s.break,1,60,5),
     density:options(s.density,['comfortable','compact','large'],'comfortable'),
     wallpaper:typeof s.wallpaper==='string'&&/^data:image\/(?:png|jpeg|webp);base64,[a-zA-Z0-9+/=]{1,600000}$/.test(s.wallpaper)?s.wallpaper:'',
+    customAccent:typeof s.customAccent==='string'&&/^#[0-9a-fA-F]{6}$/.test(s.customAccent)?s.customAccent:'',
     showSections:Object.fromEntries(['roster','tasks','deadlines','notes','focus','integrations','shortcuts','search'].map(key=>[key,s.showSections?.[key]!==false])),
     popupSize:options(s.popupSize,['normal','large'],'normal'),animations:s.animations!==false
   };
