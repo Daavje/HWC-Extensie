@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HWC Dashboard Studio</title><link rel="stylesheet" href="popup.css">
+<script type="module" src="popup.js"></script></head>
+<body>
+<header class="head"><div class="brand"><img src="assets/hwc-mark.svg" alt="" width="36" height="36">
+<div><strong>HWC<span class="purple">.</span> Studio</strong><small>Jouw dashboard, overal</small></div></div>
+<button id="popupSettings" class="round" type="button" title="Instellingen" aria-label="Instellingen openen">⚙</button></header>
+<div class="welcome"><div><p id="popupHello">Welkom terug</p><h1 id="popupToday">Vandaag</h1></div>
+<div id="popupClock">00:00</div></div>
+<div class="tabs" role="tablist">
+<button type="button" role="tab" data-tab="links" aria-selected="true">⚡ Links</button>
+<button type="button" role="tab" data-tab="tasks" aria-selected="false">☑ Taken</button>
+<button type="button" role="tab" data-tab="roster" aria-selected="false">📅 Rooster</button>
+</div>
+<main>
+<section id="pane-links" class="pane">
+  <label class="sr-only" for="linkFilter">Zoek snelkoppelingen</label>
+  <input id="linkFilter" type="search" placeholder="🔎 Snelkoppelingen zoeken...">
+  <div id="popupFolders" class="folder-chips"></div>
+  <div id="popupLinks" class="quick-grid"></div>
+  <p id="linksEmpty" class="muted" hidden>Nog geen snelkoppelingen.</p>
+</section>
+<section id="pane-tasks" class="pane" hidden>
+  <form id="quickTaskForm" class="task-add"><input id="quickTask" placeholder="Nieuwe taak..." maxlength="120" required><button type="submit">+</button></form>
+  <div id="popupTasks" class="task-items"></div>
+  <p id="tasksEmpty" class="muted" hidden>Geen openstaande taken, lekker bezig!</p>
+</section>
+<section id="pane-roster" class="pane" hidden>
+  <div class="section-bar"><strong>Komende lessen</strong><button id="syncRoster" type="button" class="minor">↻ Verversen</button></div>
+  <p id="rosterMiniStatus" class="muted">Nog niet gekoppeld.</p>
+  <div id="popupRoster" class="lesson-list"></div>
+</section>
+</main>
+<footer><button id="quickFocus" class="minor" type="button">▶ Focus starten</button>
+<a class="open" id="openDashboard" href="index.html" target="_blank" rel="noopener">Open dashboard ↗</a></footer>
+<div id="popupToast" role="status" aria-live="polite"></div>
+</body></html>

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e1528">
+  <title>HWC Dashboard Studio</title>
+  <link rel="icon" type="image/png" href="icons/icon48.png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="studio.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Ga naar inhoud</a>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="HWC Dashboard - startpagina">
+        <img class="brand-symbol brand-logo" src="assets/hwc-mark.svg" alt="">
+        <span><strong>HWC<span class="brand-accent">.</span></strong><small>YOUR SPACE</small></span>
+      </a>
+      <div class="top-actions">
+        <span class="status-dot" aria-hidden="true"></span><span class="eyebrow top-status">Alles op één plek</span>
+        <button id="settingsOpen" class="icon-button settings-button" type="button" aria-label="Instellingen openen" title="Instellingen">⚙</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="greeting">
+        <div>
+          <div class="eyebrow hero-kicker"><span class="sparkle">✦</span> JOUW PERSOONLIJKE STARTPAGINA</div>
+          <h1 id="greeting">Goedemorgen<span class="title-stop">.</span></h1>
+          <p class="hero-sub">Alles wat je nodig hebt om goed aan je dag te beginnen.</p>
+        </div>
+        <div class="date-block" aria-live="off">
+          <time id="clock" class="clock" datetime="">00:00</time>
+          <time id="today" class="today" datetime="">Vandaag</time>
+        </div>
+      </section>
+
+      <form id="searchForm" class="search-box" role="search">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <label for="searchInput" class="sr-only">Zoeken op internet</label>
+        <input id="searchInput" name="q" placeholder="Zoek op internet..." autocomplete="off" maxlength="500">
+        <span class="keycap" aria-hidden="true">Ctrl K</span>
+        <button class="search-submit" type="submit">Zoeken <span aria-hidden="true">↗</span></button>
+      </form>
+
+      <section class="shortcuts-section" aria-labelledby="shortcutsTitle">
+        <div class="section-heading"><div><div class="eyebrow">JOUW WORKSPACE</div><h2 id="shortcutsTitle">Snelkoppelingen &amp; mappen</h2></div>
+          <div class="shortcut-actions"><button id="bookmarksImport" class="small-button" type="button" title="Bladwijzers uit Chrome/Edge importeren">↓ Bladwijzers</button><button id="folderNew" class="small-button" type="button">+ Map</button><button id="shortcutAdd" class="text-button" type="button">+ Link</button></div></div>
+        <div class="folder-toolbar"><nav id="shortcutBread" aria-label="Mapnavigatie"></nav><div><button id="folderBack" class="text-button" type="button" hidden>← Terug</button><button id="folderEdit" class="text-button" type="button" hidden>✎ Map aanpassen</button></div></div>
+        <div id="shortcutGrid" class="shortcut-grid"></div>
+        <p class="hint">Sleep links om de volgorde te veranderen · <span id="shortcutTotal">0 links</span> · eigen afbeeldingen, emoji's en automatische site-iconen.</p>
+      </section>
+
+      <section id="integrationsSection" class="panel integrations-panel" aria-labelledby="integrationsTitle">
+        <div class="panel-head"><div><div class="eyebrow">ONTDEK APPS</div><h2 id="integrationsTitle">Snelle integraties</h2></div>
+          <label class="search-integrations"><span class="sr-only">Zoek integraties</span><input id="integrationsSearch" placeholder="Zoek apps..." maxlength="60"></label></div>
+        <p class="panel-foot">Voeg populaire diensten met één klik toe als snelkoppeling. Je logt bij elke dienst zelf in.</p>
+        <div id="integrationsCatalog" class="integrations-catalog"></div>
+      </section>
+      <section class="panel roster-panel" aria-labelledby="rosterTitle">
+        <div class="panel-head roster-header">
+          <div><div class="eyebrow">AUTOMATISCH UIT MAGISTER</div><h2 id="rosterTitle">Mijn rooster <span id="rosterConnection" class="roster-badge">Niet gekoppeld</span></h2></div>
+          <div class="roster-actions"><button id="rosterRefresh" class="secondary-button roster-refresh" type="button" disabled>↻ Verversen</button><button id="rosterSettings" class="small-button" type="button">⚙ Koppelen</button></div>
+        </div>
+        <p id="rosterStatus" class="roster-status" role="status" aria-live="polite">Koppel een Magister Auth Gateway om je lessen automatisch te tonen.</p>
+        <div class="roster-nav" aria-label="Weeknavigatie"><button id="rosterPrev" type="button" class="tiny-icon" aria-label="Vorige week">‹</button><strong id="rosterWeek">Deze week</strong><button id="rosterNext" type="button" class="tiny-icon" aria-label="Volgende week">›</button><button id="rosterCurrent" type="button" class="text-button">Vandaag</button></div>
+        <div id="rosterGrid" class="roster-grid" aria-live="polite"></div>
+      </section>
+
+      <div class="dashboard-grid">
+        <section class="panel tasks-panel" aria-labelledby="tasksTitle">
+          <div class="panel-head"><div><div class="eyebrow">JOUW PLANNING</div><h2 id="tasksTitle">Taken <span id="taskCount" class="count">0</span></h2></div><button id="taskAdd" class="small-button" type="button">+ Nieuwe taak</button></div>
+          <div id="taskFilters" class="filters" role="group" aria-label="Taken filteren"><button type="button" data-filter="open" class="filter active" aria-pressed="true">Openstaand</button><button type="button" data-filter="all" class="filter" aria-pressed="false">Alles</button><button type="button" data-filter="done" class="filter" aria-pressed="false">Afgerond</button></div>
+          <ul id="taskList" class="task-list" aria-live="polite"></ul>
+          <p id="tasksEmpty" class="empty" hidden>Geen taken hier. Lekker bezig! ✨</p>
+        </section>
+
+        <section class="panel deadlines-panel" aria-labelledby="deadlinesTitle">
+          <div class="panel-head"><div><div class="eyebrow">BINNENKORT</div><h2 id="deadlinesTitle">Deadlines</h2></div><button id="deadlineAdd" class="tiny-icon" type="button" aria-label="Deadline toevoegen" title="Deadline toevoegen">+</button></div>
+          <ul id="deadlineList" class="deadline-list" aria-live="polite"></ul>
+          <p id="deadlinesEmpty" class="empty" hidden>Geen aankomende deadlines.</p>
+          <p class="panel-foot">Deadlines zijn taken met een datum.</p>
+        </section>
+
+        <section class="panel notes-panel" aria-labelledby="notesTitle">
+          <div class="panel-head"><div><div class="eyebrow">EVEN ONTHOUDEN</div><h2 id="notesTitle">Snelle notities</h2></div><span id="notesStatus" class="save-status" aria-live="polite">Lokaal opgeslagen</span></div>
+          <label for="notes" class="sr-only">Persoonlijke notities</label>
+          <textarea id="notes" maxlength="12000" placeholder="Een idee, huiswerk of iets wat je niet wilt vergeten..."></textarea>
+          <p class="panel-foot">Alleen zichtbaar in deze browser. Wordt automatisch opgeslagen.</p>
+        </section>
+
+        <section class="panel focus-panel" aria-labelledby="focusTitle">
+          <div class="panel-head"><div><div class="eyebrow">TIJD VOOR FOCUS</div><h2 id="focusTitle">Focusmodus</h2></div><span class="focus-pill" id="focusState">Focus</span></div>
+          <div class="focus-content">
+            <div class="timer-ring" id="timerRing" role="timer" aria-label="Resterende focustijd"><div><span id="timerValue">25:00</span><small id="timerSubtitle">Tijd om te knallen</small></div></div>
+            <div class="timer-controls"><button id="timerToggle" class="primary-button" type="button">▶ Start focus</button><button id="timerReset" class="secondary-button" type="button">↺ Reset</button></div>
+            <div class="mode-controls"><button id="modeFocus" class="mode active" type="button" aria-pressed="true">Focus <span id="focusMinutes">25 min</span></button><button id="modeBreak" class="mode" type="button" aria-pressed="false">Pauze <span id="breakMinutes">5 min</span></button></div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer><span>HWC Dashboard Studio <span class="muted">· gemaakt voor een overzichtelijke schooldag</span></span><a href="https://github.com/Daavje/HWC-Extensie" target="_blank" rel="noopener noreferrer">Oorspronkelijke extensie ↗</a></footer>
+  </div>
+
+  <dialog id="shortcutDialog" class="modal" aria-labelledby="shortcutDialogTitle">
+    <form id="shortcutForm" class="modal-form" novalidate>
+      <div class="modal-title"><h2 id="shortcutDialogTitle">Snelkoppeling toevoegen</h2><button class="close-button" type="button" data-close="shortcutDialog" aria-label="Sluiten">×</button></div>
+      <label>Naam<input name="name" required maxlength="32" placeholder="Bijv. Moodle"></label>
+      <label>Website URL<input name="url" required maxlength="1000" placeholder="https://voorbeeld.nl" inputmode="url"></label>
+      <div class="form-split"><label>Icoonbron<select name="iconType"><option value="auto">Automatisch (website/favicon)</option><option value="emoji">Icoonbibliotheek / emoji</option><option value="upload">Mijn afbeelding uploaden</option></select></label>
+        <div class="icon-preview-holder"><span>Voorbeeld</span><div id="shortcutIconPreview"></div></div></div>
+      <div id="iconCatalogArea"><label>Emoji of icoon<input name="icon" maxlength="8" placeholder="🔗"></label>
+        <label>Zoeken in iconen<input id="iconSearch" type="search" placeholder="Kies hieronder of plak zelf een emoji"></label>
+        <div id="iconCatalog" class="icon-catalog" role="group" aria-label="Icoonbibliotheek"></div></div>
+      <div id="iconUploadArea" hidden><label>Upload eigen afbeelding<input id="iconFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></label>
+        <p class="settings-tip">Je afbeelding wordt lokaal verkleind en veilig opgeslagen.</p></div>
+      <label>In map<select name="folderId"><option value="">Geen map (Start)</option></select></label>
+      <label class="checkbox-row"><input name="pinned" type="checkbox"> Vastzetten in popup</label>
+      <p id="shortcutError" class="form-error" role="alert"></p>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close="shortcutDialog">Annuleren</button><button class="primary-button" type="submit">Opslaan</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="folderDialog" class="modal" aria-labelledby="folderTitle">
+    <form id="folderForm" class="modal-form" novalidate>
+      <div class="modal-title"><h2 id="folderTitle">Map maken</h2><button class="close-button" type="button" data-close="folderDialog" aria-label="Sluiten">×</button></div>
+      <label>Naam van de map<input name="name" maxlength="32" required placeholder="Bijv. School, Muziek, Werk"></label>
+      <label>Map-icoon<input name="icon" maxlength="8" placeholder="📁"></label>
+      <p id="folderError" class="form-error" role="alert"></p>
+      <div class="modal-actions"><button id="folderDelete" class="secondary-button danger-button" type="button" hidden>Map verwijderen</button><button class="primary-button" type="submit">Opslaan</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="taskDialog" class="modal" aria-labelledby="taskDialogTitle">
+    <form id="taskForm" class="modal-form" novalidate>
+      <div class="modal-title"><h2 id="taskDialogTitle">Nieuwe taak</h2><button class="close-button" type="button" data-close="taskDialog" aria-label="Sluiten">×</button></div>
+      <label>Wat moet je doen?<input name="title" required maxlength="120" placeholder="Bijv. Wiskunde huiswerk"></label>
+      <label>Datum (optioneel)<input name="due" type="date"></label>
+      <label>Prioriteit<select name="priority"><option value="normal">Normaal</option><option value="high">Belangrijk</option></select></label>
+      <p id="taskError" class="form-error" role="alert"></p>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close="taskDialog">Annuleren</button><button class="primary-button" type="submit">Opslaan</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="settingsDialog" class="modal settings-modal" aria-labelledby="settingsTitle">
+    <form id="settingsForm" class="modal-form" novalidate>
+      <div class="modal-title"><h2 id="settingsTitle">Instellingen</h2><button class="close-button" type="button" data-close="settingsDialog" aria-label="Sluiten">×</button></div>
+      <label>Je naam<input name="name" maxlength="30" placeholder="Hoe mogen we je noemen?"></label>
+      <label>Weergave<select name="theme"><option value="system">Systeem volgen</option><option value="dark">Donker</option><option value="light">Licht</option></select></label>
+      <label>Accentkleur<select name="accent"><option value="violet">Paars</option><option value="blue">Blauw</option><option value="mint">Mintgroen</option><option value="pink">Roze</option></select></label>
+      <label class="checkbox-row"><input type="checkbox" name="useCustomAccent"> Gebruik eigen accentkleur</label>
+      <label>Eigen accentkleur<input name="customAccent" type="color" value="#9777ff"></label>
+      <label>Zoekmachine<select name="engine"><option value="google">Google</option><option value="duckduckgo">DuckDuckGo</option><option value="bing">Bing</option></select></label>
+      <label class="checkbox-row"><input type="checkbox" name="clock24" checked> 24-uursklok gebruiken</label>
+      <div class="form-split"><label>Focus (min)<input name="focus" type="number" min="1" max="120" step="1"></label><label>Pauze (min)<input name="break" type="number" min="1" max="60" step="1"></label></div>
+      <fieldset class="custom-settings"><legend>Indeling &amp; uiterlijk</legend>
+        <label>Snelkoppelingen-layout<select name="density"><option value="comfortable">Normaal</option><option value="compact">Compact</option><option value="large">Grote tegels</option></select></label>
+        <label>Popup-formaat<select name="popupSize"><option value="normal">Normaal</option><option value="large">Extra groot</option></select></label>
+        <label class="checkbox-row"><input type="checkbox" name="animations"> Animaties gebruiken</label>
+        <p class="settings-tip">Welke onderdelen wil je zien?</p>
+        <div class="widgets-switches">
+          <label class="checkbox-row"><input type="checkbox" name="show-search"> Zoekbalk</label>
+          <label class="checkbox-row"><input type="checkbox" name="show-shortcuts"> Snelkoppelingen</label>
+          <label class="checkbox-row"><input type="checkbox" name="show-integrations"> Integraties</label>
+          <label class="checkbox-row"><input type="checkbox" name="show-roster"> Rooster</label>
+          <label class="checkbox-row"><input type="checkbox" name="show-tasks"> Taken</label>
+          <label class="checkbox-row"><input type="checkbox" name="show-deadlines"> Deadlines</label>
+          <label class="checkbox-row"><input type="checkbox" name="show-notes"> Notities</label>
+          <label class="checkbox-row"><input type="checkbox" name="show-focus"> Focus</label>
+        </div>
+        <label>Achtergrondfoto uploaden<input id="wallpaperFile" type="file" accept="image/png,image/jpeg,image/webp"></label>
+        <p id="wallpaperStatus" class="settings-tip">Standaardachtergrond</p>
+        <button id="wallpaperRemove" class="small-button" type="button">Achtergrond verwijderen</button>
+      </fieldset>
+      <div class="setting-import"><button type="button" id="exportButton" class="secondary-button">↓ Exporteer gegevens</button><label class="import-label" for="importFile">↑ Importeer gegevens<input id="importFile" type="file" accept="application/json,.json" hidden></label></div>
+      <p class="settings-tip">Je gegevens blijven lokaal in deze browser. Importeer alleen een back-up die je vertrouwt; importeren vervangt de huidige gegevens.</p>
+      <p id="settingsError" class="form-error" role="alert"></p>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close="settingsDialog">Annuleren</button><button class="primary-button" type="submit">Instellingen opslaan</button></div>
+    </form>
+  </dialog>
+  <dialog id="magisterDialog" class="modal" aria-labelledby="magisterDialogTitle">
+    <form id="magisterForm" class="modal-form" novalidate>
+      <div class="modal-title"><h2 id="magisterDialogTitle">Magister koppelen</h2><button class="close-button" type="button" data-close="magisterDialog" aria-label="Sluiten">×</button></div>
+      <p class="settings-tip">Gebruik de <a href="https://github.com/Daavje/magister-auth-gateway" target="_blank" rel="noopener noreferrer">Magister Auth Gateway</a>. Log daar één keer in en maak in het dashboard een <strong>Managed Proxy Key</strong> aan. Je Magister-wachtwoord voer je hier nooit in.</p>
+      <label>HTTPS-adres van je gateway<input name="gateway" type="url" required autocomplete="off" placeholder="https://gateway.jouwdomein.nl" spellcheck="false"></label>
+      <label>Managed Proxy Key<input name="proxyKey" type="password" autocomplete="off" spellcheck="false" placeholder="mag_sk_live_..." minlength="16"></label>
+      <p class="settings-tip">De sleutel wordt <strong>alleen lokaal</strong> in deze browser bewaard, apart van je gewone dashboard-back-ups. De extensie vraagt alleen toegang tot het gateway-adres dat je invult. Gebruik uitsluitend een gateway die je vertrouwt. Laat de sleutel leeg om je bestaande sleutel te behouden.</p>
+      <p id="magisterError" class="form-error" role="alert"></p>
+      <div class="modal-actions"><button id="magisterDisconnect" type="button" class="secondary-button danger-button" hidden>Ontkoppelen</button><button class="primary-button" type="submit">Verbinden & ophalen</button></div>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+:root{font-family:Inter,ui-sans-serif,system-ui,Arial,sans-serif;color-scheme:dark;--base:#0d1528;--panel:#172239;--line:#ffffff20;--muted:#99a8c0;--accent:#a58bff}
+*{box-sizing:border-box}
+body{margin:0;width:380px;min-height:400px;max-height:590px;overflow:auto;background:radial-gradient(ellipse at 90% -15%,#7556ca2c,transparent 58%),var(--base);color:#f9faff}
+body[data-size=large]{width:500px;max-height:610px}
+button,input{font:inherit}button{cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+[hidden]{display:none!important}
+.head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 9px}
+.brand{display:flex;gap:10px;align-items:center}.brand strong{display:block;font-size:17px;letter-spacing:-.03em}.brand small{display:block;font-size:10px;color:var(--muted);margin-top:2px}.purple{color:var(--accent)}
+.round{width:33px;height:33px;background:#ffffff12;border:1px solid var(--line);color:#eef;border-radius:10px;font-size:17px}
+.welcome{padding:17px 20px 13px;display:flex;align-items:center;justify-content:space-between}
+.welcome p{font-size:11px;color:var(--muted);margin:0 0 4px}
+.welcome h1{font-size:22px;font-weight:800;margin:0;text-transform:capitalize}
+#popupClock{font-size:23px;font-weight:800;letter-spacing:-.04em}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:3px;margin:0 20px 16px;background:#ffffff0b;border-radius:13px}
+.tabs button{border:0;border-radius:10px;color:var(--muted);background:transparent;padding:11px 5px;font-size:12px;font-weight:700}
+.tabs button[aria-selected=true]{color:#fff;background:#8564d6}
+.pane{padding:0 20px;min-height:220px}
+#linkFilter,.task-add input{background:var(--panel);border:1px solid var(--line);color:#fff;border-radius:10px;padding:10px 13px;width:100%;font-size:13px}
+#linkFilter::placeholder,.task-add input::placeholder{color:var(--muted)}
+.folder-chips{display:flex;gap:6px;overflow:auto;padding:11px 0}
+.folder-chips button{border:1px solid var(--line);border-radius:10px;color:#e4e8f8;background:#ffffff0a;flex:0 0 auto;padding:7px 9px;font-size:11px}
+.folder-chips button.active{border-color:var(--accent);background:#7861a755}
+.quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;padding:5px 0 18px}
+body[data-size=large] .quick-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+.quick-link{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0;border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:10px 4px;color:#fff;text-decoration:none}
+.quick-link:hover{border-color:var(--accent);background:#293356}
+.quick-link .ico{font-size:23px;background:#ffffff0c;display:grid;place-items:center;width:39px;height:39px;border-radius:10px}
+.quick-link .ico img{width:30px;height:30px;object-fit:contain;border-radius:6px}
+.quick-link .name{font-size:10px;max-width:100%;padding:0 3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.task-add{display:flex;gap:8px;margin-bottom:13px}.task-add button{border:0;background:var(--accent);color:#151128;font-weight:900;border-radius:9px;width:39px}
+.task-items{display:grid;gap:8px;padding-bottom:18px}
+.task-line{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:12px;padding:11px;background:var(--panel)}
+.task-line input{accent-color:var(--accent);margin-top:4px}.task-line .label{flex:1;font-size:12px}.task-line .due{font-size:10px;color:var(--muted)}
+.section-bar{display:flex;align-items:center;justify-content:space-between}
+.minor{border:1px solid var(--line);background:#ffffff0d;color:#dbdef0;border-radius:10px;padding:8px 11px;font-size:11px;font-weight:700}
+.muted{font-size:11px;color:var(--muted);line-height:1.5}
+.lesson-list{display:grid;gap:9px;margin-top:9px;padding-bottom:15px}
+.lesson{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+.lesson strong{display:block;font-size:12px}.lesson p{margin:4px 0 0;font-size:11px;color:var(--muted)}
+.lesson .homework{color:#e5d5ff}
+footer{border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:13px 20px;gap:8px}
+.open{background:var(--accent);color:#171128;font-size:12px;font-weight:800;border-radius:11px;padding:12px 15px;text-decoration:none}
+#popupToast{position:sticky;bottom:0;left:0;width:100%;font-size:12px;text-align:center;background:#453576;color:white;display:none;padding:9px}
+#popupToast.visible{display:block}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+:root[data-theme=light]{color-scheme:light;--base:#f1f4fb;--panel:#fff;--line:#1b2f501f;--muted:#64718b;--text:#17243f}
+:root[data-theme=light] body{color:var(--text);background:radial-gradient(ellipse at 90% -15%,#b6a7ef5e,transparent 58%),var(--base)}
+:root[data-theme=light] .brand strong,:root[data-theme=light] .round,:root[data-theme=light] .quick-link,:root[data-theme=light] .minor,
+:root[data-theme=light] #linkFilter,:root[data-theme=light] .task-add input{color:var(--text)}
+:root[data-theme=light] .folder-chips button{color:var(--text);background:#eaebf8}
+:root[data-theme=light] .tabs{background:#e6eafa}
+:root[data-theme=light] .quick-link:hover{background:#e9eafa}
+:root[data-theme=light] .tabs button[aria-selected=true]{color:#fff}

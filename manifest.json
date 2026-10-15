@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "HWC Dashboard Studio",
+  "short_name": "HWC Studio",
+  "description": "Persoonlijke HWC-startpagina met mappen, iconen, Magister-rooster, focus, taken en uitgebreide aanpassingen.",
+  "version": "3.0.0",
+  "minimum_chrome_version": "120",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "action": {
+    "default_title": "HWC Studio - minidashboard",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "permissions",
+    "favicon"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "optional_host_permissions": [
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "optional_permissions": [
+    "bookmarks"
+  ]
+}
