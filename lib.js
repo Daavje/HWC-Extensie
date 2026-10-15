@@ -41,8 +41,8 @@ const options=(value,allowed,fallback)=>allowed.includes(value)?value:fallback;
 const boundedInt=(n,min,max,fallback)=>Number.isInteger(Number(n))&&Number(n)>=min&&Number(n)<=max?Number(n):fallback;
 export function defaultData(){return{
   version:2,
-  settings:{name:'',theme:'system',accent:'violet',engine:'google',clock24:true,focus:25,break:5},
-  shortcuts:DEFAULT_SHORTCUTS.map(s=>({...s})),
+  settings:{name:'',theme:'system',accent:'violet',engine:'google',clock24:true,focus:25,break:5,density:'comfortable',wallpaper:'',showSections:{roster:true,tasks:true,deadlines:true,notes:true,focus:true},popupSize:'normal',animations:true},
+  shortcuts:DEFAULT_SHORTCUTS.map(s=>({...s,iconType:'auto',folderId:'',pinned:true})),folders:[],
   tasks:[],notes:'',timer:{mode:'focus',remaining:25*60,running:false,endAt:null}
 };}
 export function sanitizeData(raw,keepTimer=true){
@@ -54,13 +54,24 @@ export function sanitizeData(raw,keepTimer=true){
     accent:options(s.accent,['violet','blue','mint','pink'],'violet'),
     engine:options(s.engine,['google','duckduckgo','bing'],'google'),
     clock24:typeof s.clock24==='boolean'?s.clock24:true,
-    focus:boundedInt(s.focus,1,120,25),break:boundedInt(s.break,1,60,5)
+    focus:boundedInt(s.focus,1,120,25),break:boundedInt(s.break,1,60,5),
+    density:options(s.density,['comfortable','compact','large'],'comfortable'),
+    wallpaper:typeof s.wallpaper==='string'&&/^data:image\/(?:png|jpeg|webp);base64,[a-zA-Z0-9+/=]{1,600000}$/.test(s.wallpaper)?s.wallpaper:'',
+    showSections:Object.fromEntries(['roster','tasks','deadlines','notes','focus'].map(key=>[key,s.showSections?.[key]!==false])),
+    popupSize:options(s.popupSize,['normal','large'],'normal'),animations:s.animations!==false
   };
-  const shortcuts=Array.isArray(raw.shortcuts)?raw.shortcuts.slice(0,12).flatMap((item,i)=>{
+  const folders=Array.isArray(raw.folders)?raw.folders.slice(0,40).flatMap((item,i)=>{
+    const name=string(item?.name,32),id=string(item?.id,70)||`folder-${i}`;
+    return name?[{id,name,icon:string(item.icon,8)||'📁'}]:[];
+  }):[];
+  const folderIds=new Set(folders.map(x=>x.id));
+  const shortcuts=Array.isArray(raw.shortcuts)?raw.shortcuts.slice(0,300).flatMap((item,i)=>{
     if(!item||typeof item!=='object')return [];
     const name=string(item.name,32),url=safeUrl(item.url);
     if(!name||!url)return [];
-    return [{id:string(item.id,70)||`link-${i}`,name,url,icon:string(item.icon,8)||'🔗'}];
+    const image=typeof item.image==='string'&&/^data:image\/(?:png|jpeg|webp);base64,[a-zA-Z0-9+/=]{1,65000}$/.test(item.image)?item.image:'';
+    const iconType=options(item.iconType,['auto','emoji','upload'],'emoji');
+    return [{id:string(item.id,70)||`link-${i}`,name,url,icon:string(item.icon,8)||'🔗',iconType:iconType==='upload'&&!image?'auto':iconType,image,folderId:folderIds.has(item.folderId)?item.folderId:'',pinned:item.pinned===true}];
   }):defaults.shortcuts;
   const tasks=Array.isArray(raw.tasks)?raw.tasks.slice(0,500).flatMap((item,i)=>{
     if(!item||typeof item!=='object')return [];
@@ -72,5 +83,5 @@ export function sanitizeData(raw,keepTimer=true){
   const fullMinutes=mode==='focus'?settings.focus:settings.break;
   const t=raw.timer||{};
   const timer=keepTimer?{mode,remaining:boundedInt(t.remaining,0,7200,fullMinutes*60),running:t.running===true&&Number.isFinite(t.endAt)&&t.endAt>0,endAt:Number.isFinite(t.endAt)?t.endAt:null}:{mode:'focus',remaining:settings.focus*60,running:false,endAt:null};
-  return{version:2,settings,shortcuts,tasks,notes:typeof raw.notes==='string'?raw.notes.slice(0,12000):'',timer};
+  return{version:2,settings,shortcuts,folders,tasks,notes:typeof raw.notes==='string'?raw.notes.slice(0,12000):'',timer};
 }
