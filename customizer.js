@@ -1,5 +1,5 @@
 const $=id=>document.getElementById(id);
-const SECTIONS=['roster','tasks','deadlines','notes','focus'];
+const SECTIONS=['roster','tasks','deadlines','notes','focus','integrations','shortcuts','search'];
 export function setupCustomizer({getData,save,notify}) {
   const getSettings=()=>getData().settings;
   const apply=()=>{
@@ -10,7 +10,8 @@ export function setupCustomizer({getData,save,notify}) {
     root.style.setProperty('--user-wallpaper',s.wallpaper?'url("'+s.wallpaper+'")':'none');
     document.body.classList.toggle('has-wallpaper',Boolean(s.wallpaper));
     for(const section of SECTIONS){
-      const node=document.querySelector('.'+section+'-panel');
+      const className={integrations:'.integrations-panel',shortcuts:'.shortcuts-section',search:'.search-box'}[section]||'.'+section+'-panel';
+      const node=document.querySelector(className);
       if(node)node.hidden=s.showSections?.[section]===false;
     }
   };
